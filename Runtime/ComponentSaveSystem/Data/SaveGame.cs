@@ -105,7 +105,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
 
             for (int i = 0; i < allKeys.Count; i++)
             {
-                Remove(allKeys[i]);
+                List<string> dataKeys = sceneObjectIDS[allKeys[i]];
+
+                for (int j = 0; j < dataKeys.Count; j++)
+                {
+                    Remove(dataKeys[j]);
+                }
             }
         }
 
