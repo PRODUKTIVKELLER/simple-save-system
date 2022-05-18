@@ -773,6 +773,30 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         }
 
         /// <summary>
+        /// Set a bool value in the currently active save
+        /// </summary>
+        /// <param name="key"> Identifier for value </param>
+        /// <param name="value"> Value to store </param>
+        public static void SetBool(string key, bool value)
+        {
+            if (HasActiveSaveLogAction("Set Bool") == false) return;
+            activeSaveGame.Set(string.Format("FVar-{0}", key), value.ToString(), "Global");
+        }
+
+        /// <summary>
+        /// Get a bool value in the currently active save
+        /// </summary>
+        /// <param name="key"> Identifier to remember storage point </param>
+        /// <param name="defaultValue"> In case it fails to obtain the value, return this value </param>
+        /// <returns> Stored value </returns>
+        public static bool GetBool(string key, bool defaultValue = false)
+        {
+            if (HasActiveSaveLogAction("Get Bool") == false) return defaultValue;
+            var getData = activeSaveGame.Get(string.Format("FVar-{0}", key));
+            return string.IsNullOrEmpty((getData)) ? defaultValue : bool.Parse(getData);
+        }
+
+        /// <summary>
         /// Set a string value in the currently active save
         /// </summary>
         /// <param name="key"> Identifier for value </param>
