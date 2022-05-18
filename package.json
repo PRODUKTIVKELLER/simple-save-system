@@ -1,0 +1,21 @@
+{
+    "name": "com.produktivkeller.simple-save-system",
+    "version": "0.1.0",
+    "displayName": "Simple Save System",
+    "description":"A light-weight tool for saving objects and states to files.",
+    "documentationUrl": "https://github.com/PRODUKTIVKELLER/simple-save-system",
+    "gitDependencies": {
+        "com.produktivkeller.simple-logging": "https://github.com/PRODUKTIVKELLER/simple-logging.git"
+    },
+    "keywords": [
+        "save",        
+        "file",
+        "save system",
+        "simple"
+    ],
+    "author": {
+        "name": "PRODUKTIVKELLER Studios",
+        "email": "info@produktivkeller.com",
+        "url": "https://www.produktivkeller.com"
+    }
+}
