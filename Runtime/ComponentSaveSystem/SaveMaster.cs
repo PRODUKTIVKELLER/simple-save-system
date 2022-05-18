@@ -441,6 +441,26 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         }
 
         /// <summary>
+        /// Wipe all data of the currently active savegame.
+        /// </summary>
+        public static void WipeAllData()
+        {
+            if (activeSaveGame == null)
+            {
+                Debug.LogError("Failed to wipe all data: No save game loaded.");
+                return;
+            }
+
+            int listenerCount = saveables.Count;
+            for (int i = listenerCount - 1; i >= 0; i--)
+            {
+                saveables[i].WipeData(activeSaveGame);
+            }
+
+            activeSaveGame.WipeAllData();
+        }
+
+        /// <summary>
         /// Wipe all data of a specified saveable
         /// </summary>
         /// <param name="saveable"></param>

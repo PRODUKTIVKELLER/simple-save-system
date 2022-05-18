@@ -99,6 +99,16 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             }
         }
 
+        public void WipeAllData()
+        {
+            List<string> allKeys = new List<string>(sceneObjectIDS.Keys);
+
+            for (int i = 0; i < allKeys.Count; i++)
+            {
+                Remove(allKeys[i]);
+            }
+        }
+
         public void Remove(string id)
         {
             int saveIndex;
