@@ -25,6 +25,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
         [SerializeField, Tooltip("It will scan other objects for ISaveable components")]
         private List<GameObject> externalListeners = new List<GameObject>();
 
+        [SerializeField] private bool saveOnDestroy;
+
         [SerializeField, HideInInspector]
         private List<CachedSaveableComponent> cachedSaveableComponents = new List<CachedSaveableComponent>();
 
@@ -322,7 +324,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
         {
             if (!manualSaveLoad)
             {
-                SaveMaster.RemoveListener(this);
+                SaveMaster.RemoveListener(this, saveOnDestroy);
             }
 
 #if UNITY_EDITOR
