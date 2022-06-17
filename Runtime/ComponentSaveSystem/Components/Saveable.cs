@@ -339,7 +339,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
 
                     if (!string.IsNullOrEmpty(dataString))
                     {
-                        saveGame.Set(getIdentification, dataString, this.gameObject.scene.name);
+                        saveGame.Set(getIdentification, dataString, "Global");
                     }
                 }
             }
