@@ -508,12 +508,16 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <param name="saveable"> Reference to the saveable that listens to the Save Master </param>
         public static void AddListener(Saveable saveable)
         {
+            InitializeIfNeccessary();
+
             if (saveable != null && activeSaveGame != null)
             {
                 saveable.OnLoadRequest(activeSaveGame);
             }
 
             saveables.Add(saveable);
+
+            ValidateSaveableIDs();
         }
 
         /// <summary>
@@ -522,6 +526,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <param name="saveable"> Reference to the saveable that listens to the Save Master </param>
         public static void AddListener(Saveable saveable, bool loadData)
         {
+            InitializeIfNeccessary();
+
             if (loadData)
             {
                 AddListener(saveable);
@@ -530,6 +536,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             {
                 saveables.Add(saveable);
             }
+
+            ValidateSaveableIDs();
         }
 
         /// <summary>
@@ -905,17 +913,20 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private System.Action<int> onWritingToDiskBegin = delegate { };
         private System.Action<int> onWritingToDiskDone = delegate { };
 
-        private void Awake()
+
+
+        private static void InitializeIfNeccessary(SaveMaster saveMasterInstance)
         {
-            if (instance != null)
+            if (instance != null
+                && instance.GetInstanceID() != saveMasterInstance.GetInstanceID())
             {
                 Debug.LogWarning("Duplicate save master found. " +
                                  "Ensure that the save master has not been added anywhere in your scene.");
-                GameObject.Destroy(this.gameObject);
+                GameObject.Destroy(saveMasterInstance.gameObject);
                 return;
             }
 
-            instance = this;
+            instance = saveMasterInstance;
 
             var settings = SaveSettings.Get();
 
@@ -926,17 +937,51 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
             if (settings.trackTimePlayed)
             {
-                StartCoroutine(IncrementTimePlayed());
+                instance.StartCoroutine(instance.IncrementTimePlayed());
             }
 
             if (settings.useHotkeys)
             {
-                StartCoroutine(TrackHotkeyUsage());
+                instance.StartCoroutine(instance.TrackHotkeyUsage());
             }
 
             if (settings.saveOnInterval)
             {
-                StartCoroutine(AutoSaveGame());
+                instance.StartCoroutine(instance.AutoSaveGame());
+            }
+        }
+
+        private static void InitializeIfNeccessary()
+        {
+            SaveMaster saveMaster = FindObjectOfType<SaveMaster>();
+            InitializeIfNeccessary(saveMaster);
+        }
+
+        private void Awake()
+        {
+            InitializeIfNeccessary(this);
+        }
+
+        private static void ValidateSaveableIDs()
+        {
+            List<string> saveableIDs = new List<string>();
+            List<string> componentIDs = new List<string>();
+            for (int i = 0; i < saveables.Count; i++)
+            {
+                if (saveableIDs.Contains(saveables[i].SaveIdentification))
+                {
+                    Debug.LogError("Duplicate saveable ID found: [" + saveables[i].SaveIdentification + "]", saveables[i].gameObject);
+                }
+                saveableIDs.Add(saveables[i].SaveIdentification);
+
+                for (int j = 0; j < saveables[i].AllComponentIDs.Count; j++)
+                {
+                    if (componentIDs.Contains(saveables[i].AllComponentIDs[j]))
+                    {
+                        Debug.LogError("Duplicate saveable component ID found: [" + saveables[i].AllComponentIDs[j] + "]", saveables[i].gameObject);
+                    }
+                    componentIDs.Add(saveables[i].AllComponentIDs[j]);
+                }
             }
         }
 

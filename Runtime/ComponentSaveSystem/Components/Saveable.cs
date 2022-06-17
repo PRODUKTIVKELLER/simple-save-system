@@ -95,78 +95,17 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
             isPrefab = this.gameObject.scene.name == null;
 #endif
 
-            // Set a new save identification if it is not a prefab at the moment.
             if (!isPrefab)
             {
                 ValidateHierarchy.ValidateHierarchy.Add(this);
 
-                bool isDuplicate = false;
-                Saveable saveable = null;
-
                 if (sceneName != gameObject.scene.name)
                 {
-                    UnityEditor.Undo.RecordObject(this, "Updated Object Scene ID");
-
-                    if (SaveSettings.Get().resetSaveableIdOnNewScene)
-                    {
-                        saveIdentification = "";
-                    }
-
                     sceneName = gameObject.scene.name;
-                }
-
-                if (SaveSettings.Get().resetSaveableIdOnDuplicate)
-                {
-                    // Does the object have a valid save id? If not, we give a new one.
-                    if (!string.IsNullOrEmpty(saveIdentification))
-                    {
-                        isDuplicate = saveIdentificationCache.TryGetValue(saveIdentification, out saveable);
-
-                        if (!isDuplicate)
-                        {
-                            if (saveIdentification != "")
-                            {
-                                saveIdentificationCache.Add(saveIdentification, this);
-                            }
-                        }
-                        else
-                        {
-                            if (saveable == null)
-                            {
-                                saveIdentificationCache.Remove(saveIdentification);
-                                saveIdentificationCache.Add(saveIdentification, this);
-                            }
-                            else
-                            {
-                                if (saveable.gameObject != this.gameObject)
-                                {
-                                    UnityEditor.Undo.RecordObject(this, "Updated Object Scene ID");
-                                    saveIdentification = "";
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (string.IsNullOrEmpty(saveIdentification))
-                {
-                    UnityEditor.Undo.RecordObject(this, "ClearedSaveIdentification");
-
-                    int guidLength = SaveSettings.Get().gameObjectGuidLength;
-
-#if NET_4_6
-                    saveIdentification = $"{gameObject.scene.name}-{gameObject.name}-{System.Guid.NewGuid().ToString().Substring(0, 5)}";
-#else
-                    saveIdentification = string.Format("{0}-{1}-{2}", gameObject.scene.name, gameObject.name, System.Guid.NewGuid().ToString().Substring(0, guidLength));
-#endif
-                    saveIdentificationCache.Add(saveIdentification, this);
-
-                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(this.gameObject.scene);
                 }
             }
             else
             {
-                saveIdentification = string.Empty;
                 sceneName = string.Empty;
             }
 
@@ -225,7 +164,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
 
                     var identifier = "";
 
-                    while (!IsIdentifierUnique(identifier))
+                    /*while (!IsIdentifierUnique(identifier))
                     {
                         int guidLength = SaveSettings.Get().componentGuidLength;
                         string guidString = System.Guid.NewGuid().ToString().Substring(0, guidLength);
@@ -233,6 +172,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
                     }
 
                     newSaveableComponent.identifier = identifier;
+
+                    */
 
                     cachedSaveableComponents.Add(newSaveableComponent);
                 }
@@ -331,7 +272,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
             if (!Application.isPlaying)
             {
                 ValidateHierarchy.ValidateHierarchy.Remove(this);
-                saveIdentificationCache.Remove(saveIdentification);
+                //saveIdentificationCache.Remove(saveIdentification);
             }
 #endif
         }
@@ -450,6 +391,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
                     }
                 }
             }
+        }
+
+        public List<string> AllComponentIDs
+        {
+            get => saveableComponentIDs;
         }
     }
 }
