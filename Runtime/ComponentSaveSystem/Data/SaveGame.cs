@@ -14,7 +14,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         [Serializable]
         public struct MetaData
         {
-            public int gameVersion;
+            public ulong  version;
+            public int    gameVersion;
             public string creationDate;
             public string timePlayed;
         }
@@ -22,16 +23,18 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         [Serializable]
         public struct Data
         {
+            public ulong  version;
             public string guid;
             public string data;
             public string scene;
         }
 
         [NonSerialized] public TimeSpan timePlayed;
-        [NonSerialized] public int gameVersion;
+        [NonSerialized] public int      gameVersion;
+        [NonSerialized] public ulong    version;
         [NonSerialized] public DateTime creationDate;
 
-        [SerializeField] private MetaData metaData;
+        [SerializeField] private MetaData   metaData;
         [SerializeField] private List<Data> saveData = new List<Data>();
 
         // Stored in dictionary for quick lookup
@@ -51,14 +54,16 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                 creationDate = DateTime.Now;
             }
 
-            metaData.creationDate = creationDate.ToString();
-            metaData.gameVersion = gameVersion;
-            metaData.timePlayed = timePlayed.ToString();
+            metaData.creationDate   = creationDate.ToString();
+            metaData.gameVersion    = gameVersion;
+            metaData.timePlayed     = timePlayed.ToString();
+            metaData.version        = version;
         }
 
         public void OnLoad()
         {
             gameVersion = metaData.gameVersion;
+            version     = metaData.version;
 
             DateTime.TryParse(metaData.creationDate, out creationDate);
             TimeSpan.TryParse(metaData.timePlayed, out timePlayed);
@@ -132,22 +137,39 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         /// </summary>
         /// <param name="id"> Save Identification </param>
         /// <param name="data"> Data in a string format </param>
-        public void Set(string id, string data, string scene)
+        public void Set(string id, string data, string scene, ulong version)
         {
             int saveIndex;
 
             if (saveDataCache.TryGetValue(id, out saveIndex))
             {
-                saveData[saveIndex] = new Data() { guid = id, data = data, scene = scene };
+                saveData[saveIndex] = new Data()
+                {
+                    guid = id,
+                    data = data,
+                    scene = scene,
+                    version = version,
+                };
             }
             else
             {
-                Data newSaveData = new Data() { guid = id, data = data, scene = scene };
+                Data newSaveData = new Data()
+                {
+                    guid = id,
+                    data = data,
+                    scene = scene,
+                    version = version,
+                };
 
                 saveData.Add(newSaveData);
                 saveDataCache.Add(id, saveData.Count - 1);
                 AddSceneID(scene, id);
             }
+        }
+
+        public void Set(string id, string data, string scene)
+        {
+            Set(id, data, scene, 0);
         }
 
         /// <summary>
@@ -166,6 +188,25 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             else
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the version of the given component identifier
+        /// </summary>
+        /// <param name="id"> Save Identification </param>
+        /// <returns></returns>
+        public ulong GetVersion(string id)
+        {
+            int saveIndex;
+
+            if (saveDataCache.TryGetValue(id, out saveIndex))
+            {
+                return saveData[saveIndex].version;
+            }
+            else
+            {
+                return 0;
             }
         }
 

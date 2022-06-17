@@ -930,6 +930,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
             var settings = SaveSettings.Get();
 
+            if (settings.writebackToFileDisabled)
+            {
+                Debug.LogError("Writeback is disabled. Make sure to enable it again, otherwise no savegame will ever be stored to files");
+            }
+
             if (settings.loadDefaultSlotOnStart)
             {
                 SetSlot(settings.defaultSlot, true);

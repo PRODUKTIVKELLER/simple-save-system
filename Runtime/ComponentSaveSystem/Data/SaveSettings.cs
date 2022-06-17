@@ -103,6 +103,10 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
 
 #endif
 
+        [Header("Versioning")]
+        public ulong saveGameVersion;
+        public bool writebackToFileDisabled;
+
         [Header("Storage Settings")]
         public string fileExtensionName = ".savegame";
         public string fileFolderName = "SaveData";

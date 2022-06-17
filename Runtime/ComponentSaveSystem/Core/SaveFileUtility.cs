@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
+using Produktivkeller.SimpleSaveSystem.VersionRollback;
 using UnityEngine;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -19,6 +20,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
     [DllImport("__Internal")]
     private static extern void WindowAlert(string message);
 #endif
+
+        private static Dictionary<string, SaveGame> _writebackDisabledSavegamesCache = new Dictionary<string, SaveGame>();
 
         private static string fileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
         private static string gameFileName { get { return SaveSettings.Get().fileName; } }
@@ -85,7 +88,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
             return newSavePaths;
         }
 
-        private static SaveGame LoadSaveFromPath(string savePath)
+        public static SaveGame LoadSaveFromPath(string savePath)
         {
             string data = "";
 
@@ -137,6 +140,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static SaveGame LoadSave(int slot, bool createIfEmpty = false)
         {
+            RollbackMaster.ProcessAllSavegames();
+
             if (slot < 0)
             {
                 Debug.LogWarning("Attempted to load negative slot");
@@ -151,6 +156,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
             if (SaveFileUtility.ObtainSavePaths().TryGetValue(slot, out savePath))
             {
+                if (_writebackDisabledSavegamesCache.ContainsKey(savePath.Replace("\\", "/")))
+                {
+                    Debug.LogError("Took cached savegame, because writeback was disabled");
+                    return _writebackDisabledSavegamesCache[savePath.Replace("\\", "/")];
+                }
+
                 SaveGame saveGame = LoadSaveFromPath(savePath);
 
                 if (saveGame == null)
@@ -187,6 +198,17 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
         public static void WriteSave(SaveGame saveGame, int saveSlot)
         {
             string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), fileExtentionName);
+
+            if (SaveSettings.Get().writebackToFileDisabled)
+            {
+                if (_writebackDisabledSavegamesCache.ContainsKey(savePath) == false)
+                {
+                    _writebackDisabledSavegamesCache.Add(savePath.Replace("\\", "/"), saveGame);
+                }
+                _writebackDisabledSavegamesCache[savePath] = saveGame;
+                return;
+            }
+
 
             if (!cachedSavePaths.ContainsKey(saveSlot))
             {

@@ -22,5 +22,14 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Interfaces
         /// This is useful when you want to call OnSave() only when something has actually changed.
         /// </summary>
         bool OnSaveCondition();
+
+        /// <summary>
+        /// Returns the current version of the saveable. If increased, a rollback script has
+        /// to be created to perform a rollback
+        /// </summary>
+        ulong SaveableVersion()
+        {
+            return 0;
+        }
     }
 }

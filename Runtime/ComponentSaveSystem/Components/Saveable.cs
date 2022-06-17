@@ -339,7 +339,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
 
                     if (!string.IsNullOrEmpty(dataString))
                     {
-                        saveGame.Set(getIdentification, dataString, "Global");
+                        saveGame.Set(getIdentification, dataString, "Global", getSaveable.SaveableVersion());
                     }
                 }
             }
@@ -384,10 +384,25 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
                 else
                 {
                     string getData = saveGame.Get(saveableComponentIDs[i]);
+                    ulong version = saveGame.GetVersion(saveableComponentIDs[i]);
 
                     if (!string.IsNullOrEmpty(getData))
                     {
-                        getSaveable.OnLoad(getData);
+                        if (getSaveable.SaveableVersion() == version)
+                        {
+                            getSaveable.OnLoad(getData);
+                        }
+                        else
+                        {
+                            Debug.LogError("Saveable version mismatch. It seems there is a version rollback missing for "
+                                + "\"" + saveableComponentIDs[i] + "\"."
+                                + "\nVersion in file: " + version.ToString() + ", Version of saveable: " + getSaveable.SaveableVersion().ToString(),
+                                gameObject);
+
+                            SaveSettings.Get().writebackToFileDisabled = true;
+
+                            Debug.LogError("Writeback has been disabled in SaveSystemSettings for debugging this issue. When resolved, make sure to enable writeback again");
+                        }
                     }
                 }
             }
