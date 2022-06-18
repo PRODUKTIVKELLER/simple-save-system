@@ -1006,6 +1006,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             List<string> componentIDs = new List<string>();
             for (int i = 0; i < saveables.Count; i++)
             {
+                if (saveables[i].SaveIdentification.Length <= 0)
+                {
+                    Debug.LogError("Saveable ID is empty", saveables[i].gameObject);
+                }
+
                 if (saveableIDs.Contains(saveables[i].SaveIdentification))
                 {
                     Debug.LogError("Duplicate saveable ID found: [" + saveables[i].SaveIdentification + "]", saveables[i].gameObject);
