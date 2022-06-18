@@ -128,7 +128,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
             // Then we give it a new identification, and we store it into our spawninfo array so we know to spawn it again.
             if (string.IsNullOrEmpty(saveIdentification))
             {
-                saveable.SaveIdentification = string.Format("{0}-{1}-{2}", SceneID, saveable.name, spawnCountHistory);
+                /*saveable.SaveIdentification = string.Format("{0}-{1}-{2}", SceneID, saveable.name, spawnCountHistory);
 
                 spawnInfo.Add(savedInstance, new SpawnInfo()
                 {
@@ -139,11 +139,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
                 spawnCountHistory++;
 
-                loadedIDs.Add(saveable.SaveIdentification);
+                loadedIDs.Add(saveable.SaveIdentification);*/
             }
             else
             {
-                saveable.SaveIdentification = saveIdentification;
+                //saveable.SaveIdentification = saveIdentification;
                 loadedIDs.Add(saveable.SaveIdentification);
             }
 

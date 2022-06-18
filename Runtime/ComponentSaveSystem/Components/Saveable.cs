@@ -87,28 +87,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
             if (Application.isPlaying)
                 return;
 
-            bool isPrefab;
-
-#if UNITY_2018_3_OR_NEWER 
-            isPrefab = UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this.gameObject);
-#else
-            isPrefab = this.gameObject.scene.name == null;
-#endif
-
-            if (!isPrefab)
-            {
-                ValidateHierarchy.ValidateHierarchy.Add(this);
-
-                if (sceneName != gameObject.scene.name)
-                {
-                    sceneName = gameObject.scene.name;
-                }
-            }
-            else
-            {
-                sceneName = string.Empty;
-            }
-
             List<ISaveable> obtainSaveables = new List<ISaveable>();
 
             obtainSaveables.AddRange(GetComponentsInChildren<ISaveable>(true).ToList());
