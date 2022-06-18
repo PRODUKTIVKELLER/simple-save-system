@@ -160,43 +160,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
                         monoBehaviour = missingElements[i] as MonoBehaviour
                     };
 
-                    string typeString = newSaveableComponent.monoBehaviour.GetType().Name.ToString();
-
-                    var identifier = "";
-
-                    /*while (!IsIdentifierUnique(identifier))
-                    {
-                        int guidLength = SaveSettings.Get().componentGuidLength;
-                        string guidString = System.Guid.NewGuid().ToString().Substring(0, guidLength);
-                        identifier = string.Format("{0}-{1}", typeString, guidString);
-                    }
-
-                    newSaveableComponent.identifier = identifier;
-
-                    */
-
                     cachedSaveableComponents.Add(newSaveableComponent);
                 }
-
-                UnityEditor.EditorUtility.SetDirty(this);
-                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(this.gameObject.scene);
             }
-        }
-
-        private bool IsIdentifierUnique(string identifier)
-        {
-            if (string.IsNullOrEmpty(identifier))
-                return false;
-
-            for (int i = 0; i < cachedSaveableComponents.Count; i++)
-            {
-                if (cachedSaveableComponents[i].identifier == identifier)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         public void Refresh()
