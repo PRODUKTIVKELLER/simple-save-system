@@ -388,6 +388,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// </summary>
         public static void WriteActiveSaveToDisk()
         {
+            if (!AreSaveableIDsUnique())
+            {
+                Debug.LogError("Saving aborted due to duplicate saveable IDs");
+                return;
+            }
+
             OnWritingToDiskBegin.Invoke(activeSlot);
 
             if (activeSaveGame != null)
@@ -808,7 +814,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         public static void SetBool(string key, bool value)
         {
             if (HasActiveSaveLogAction("Set Bool") == false) return;
-            activeSaveGame.Set(string.Format("FVar-{0}", key), value.ToString(), "Global");
+            activeSaveGame.Set(string.Format("BVar-{0}", key), value.ToString(), "Global");
         }
 
         /// <summary>
@@ -820,7 +826,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         public static bool GetBool(string key, bool defaultValue = false)
         {
             if (HasActiveSaveLogAction("Get Bool") == false) return defaultValue;
-            var getData = activeSaveGame.Get(string.Format("FVar-{0}", key));
+            var getData = activeSaveGame.Get(string.Format("BVar-{0}", key));
             return string.IsNullOrEmpty((getData)) ? defaultValue : bool.Parse(getData);
         }
 
@@ -876,6 +882,33 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                     saveIM.DestroyAllObjects();
                 }
             }
+        }
+
+        private static bool AreSaveableIDsUnique()
+        {
+            bool areAllUnique = true;
+            List<string> uniqueIdentifiers = new List<string>();
+            for (int i = 0; i < saveables.Count; i++)
+            {
+                if (uniqueIdentifiers.Contains(saveables[i].SaveIdentification))
+                {
+                    areAllUnique = false;
+                    Debug.LogError("Duplicate saveable identifier: [" + saveables[i].SaveIdentification + "]", saveables[i].gameObject);
+                }
+                uniqueIdentifiers.Add(saveables[i].SaveIdentification);
+
+                for (int j = 0; j < saveables[i].AllComponentIDs.Count; j++)
+                {
+                    if (uniqueIdentifiers.Contains(saveables[i].AllComponentIDs[j]))
+                    {
+                        areAllUnique = false;
+                        Debug.LogError("Duplicate saveable component identifier: [" + saveables[i].AllComponentIDs[j] + "]", saveables[i].gameObject);
+                    }
+                    uniqueIdentifiers.Add(saveables[i].AllComponentIDs[j]);
+                }
+            }
+
+            return areAllUnique;
         }
 
         // Events

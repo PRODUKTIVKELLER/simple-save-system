@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
-using Produktivkeller.SimpleSaveSystem.VersionRollback;
+using Produktivkeller.SimpleSaveSystem.Migration;
 using UnityEngine;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -140,7 +140,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static SaveGame LoadSave(int slot, bool createIfEmpty = false)
         {
-            RollbackMaster.ProcessAllSavegames();
+            MigrationMaster.ProcessAllSavegames();
 
             if (slot < 0)
             {
@@ -185,6 +185,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
                     Log(string.Format("Creating save at slot {0}", slot));
 
                     SaveGame saveGame = new SaveGame();
+                    saveGame.version = MigrationMaster.GetMostRecentMigrationVersion();
+                    saveGame.AddCreationVersionToMigrationHistory(saveGame.version);
 
                     WriteSave(saveGame, slot);
 

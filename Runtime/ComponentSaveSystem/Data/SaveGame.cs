@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Produktivkeller.SimpleSaveSystem.Migration;
+using System.Globalization;
 
 namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
 {
@@ -14,16 +16,16 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         [Serializable]
         public struct MetaData
         {
-            public ulong  version;
-            public int    gameVersion;
-            public string creationDate;
-            public string timePlayed;
+            public ulong    version;
+            public string[] migrationHistory;
+            public int      gameVersion;
+            public string   creationDate;
+            public string   timePlayed;
         }
 
         [Serializable]
         public struct Data
         {
-            public ulong  version;
             public string guid;
             public string data;
             public string scene;
@@ -137,7 +139,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         /// </summary>
         /// <param name="id"> Save Identification </param>
         /// <param name="data"> Data in a string format </param>
-        public void Set(string id, string data, string scene, ulong version)
+        public void Set(string id, string data, string scene)
         {
             int saveIndex;
 
@@ -148,7 +150,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                     guid = id,
                     data = data,
                     scene = scene,
-                    version = version,
                 };
             }
             else
@@ -158,7 +159,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                     guid = id,
                     data = data,
                     scene = scene,
-                    version = version,
                 };
 
                 saveData.Add(newSaveData);
@@ -167,9 +167,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             }
         }
 
-        public void Set(string id, string data, string scene)
+        public void Set(string id, string data)
         {
-            Set(id, data, scene, 0);
+            Set(id, data, "Global");
         }
 
         /// <summary>
@@ -192,25 +192,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         }
 
         /// <summary>
-        /// Returns the version of the given component identifier
-        /// </summary>
-        /// <param name="id"> Save Identification </param>
-        /// <returns></returns>
-        public ulong GetVersion(string id)
-        {
-            int saveIndex;
-
-            if (saveDataCache.TryGetValue(id, out saveIndex))
-            {
-                return saveData[saveIndex].version;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        /// <summary>
         /// Adds the index to a list that is identifyable by scene
         /// Makes it easy to remove save data related to a scene name.
         /// </summary>
@@ -229,6 +210,35 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                 list.Add(id);
                 sceneObjectIDS.Add(scene, list);
             }
+        }
+
+        public void AddPerformedMigrationToHistory(Produktivkeller.SimpleSaveSystem.Migration.Migration migration)
+        {
+            if (metaData.migrationHistory == null)
+            {
+                metaData.migrationHistory = new string[0];
+            }
+
+            string[] newMigrationHistory = new string[metaData.migrationHistory.Length + 1];
+            for (int i = 0; i < metaData.migrationHistory.Length; i++)
+            {
+                newMigrationHistory[i] = metaData.migrationHistory[i];
+            }
+            newMigrationHistory[newMigrationHistory.Length - 1] = "[" + migration.version.ToString() + "] "
+                + "[" + DateTime.UtcNow.ToString("G", CultureInfo.GetCultureInfo("en-US")) + "] "
+                + migration.description;
+
+            metaData.migrationHistory = newMigrationHistory;
+        }
+
+        public void AddCreationVersionToMigrationHistory(ulong creationVersion)
+        {
+            metaData.migrationHistory = new string[]
+            {
+                "[" + creationVersion.ToString() + "] "
+                + "[" + DateTime.UtcNow.ToString("G", CultureInfo.GetCultureInfo("en-US")) + "] "
+                + "Created initial savegame"
+            };
         }
     }
 }
