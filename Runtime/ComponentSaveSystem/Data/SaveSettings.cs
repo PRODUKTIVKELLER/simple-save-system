@@ -109,6 +109,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         [Header("Storage Settings")]
         public string fileExtensionName = ".savegame";
         public string fileFolderName = "SaveData";
+        public string fileFolderNameEditor = "SaveData Editor";
         public string fileName = "Slot";
         public bool useJsonPrettyPrint = true;
 

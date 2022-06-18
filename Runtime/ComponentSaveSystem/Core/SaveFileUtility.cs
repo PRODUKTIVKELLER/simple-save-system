@@ -34,7 +34,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
             {
                 return string.Format("{0}/{1}",
                     Application.persistentDataPath,
-                    SaveSettings.Get().fileFolderName);
+                    Application.isEditor
+                        ? SaveSettings.Get().fileFolderNameEditor
+                        : SaveSettings.Get().fileFolderName);
             }
         }
 
