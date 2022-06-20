@@ -13,5 +13,11 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
         {
             return saveGame;
         }
+
+        protected void RenameID(SaveGame saveGame, string oldID, string newID)
+        {
+            string data = saveGame.Get("oldID");
+            saveGame.Set("newID", data);
+        }
     }
 }
