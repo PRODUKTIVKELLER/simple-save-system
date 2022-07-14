@@ -16,8 +16,8 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
 
         protected void RenameID(SaveGame saveGame, string oldID, string newID)
         {
-            string data = saveGame.Get("oldID");
-            saveGame.Set("newID", data);
+            string data = saveGame.Get(oldID);
+            saveGame.Set(newID, data);
         }
     }
 }

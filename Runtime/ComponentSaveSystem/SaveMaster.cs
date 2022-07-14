@@ -973,11 +973,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                 SetSlot(settings.defaultSlot, true);
             }
 
-            if (settings.trackTimePlayed)
-            {
-                instance.StartCoroutine(instance.IncrementTimePlayed());
-            }
-
             if (settings.useHotkeys)
             {
                 instance.StartCoroutine(instance.TrackHotkeyUsage());
@@ -998,6 +993,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private void Awake()
         {
             InitializeIfNeccessary(this);
+        }
+
+        private void Update()
+        {
+            TrackTimePlayed();
         }
 
         private static void ValidateSaveableIDs()
@@ -1092,18 +1092,18 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             }
         }
 
-        private IEnumerator IncrementTimePlayed()
+        private void TrackTimePlayed()
         {
-            WaitForSeconds incrementSecond = new WaitForSeconds(1);
+            var settings = SaveSettings.Get();
 
-            while (true)
+            if (!settings.trackTimePlayed)
             {
-                yield return incrementSecond;
+                return;
+            }
 
-                if (activeSlot >= 0)
-                {
-                    activeSaveGame.timePlayed = activeSaveGame.timePlayed.Add(TimeSpan.FromSeconds(1));
-                }
+            if (activeSlot >= 0)
+            {
+                activeSaveGame.timePlayed = activeSaveGame.timePlayed.Add(TimeSpan.FromSeconds(Time.deltaTime));
             }
         }
 
