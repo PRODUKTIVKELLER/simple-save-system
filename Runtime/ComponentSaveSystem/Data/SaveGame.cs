@@ -20,6 +20,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             public string[] migrationHistory;
             public int      gameVersion;
             public string   creationDate;
+            public string   lastSaveDate;
             public string   timePlayed;
         }
 
@@ -35,6 +36,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         [NonSerialized] public int      gameVersion;
         [NonSerialized] public ulong    version;
         [NonSerialized] public DateTime creationDate;
+        [NonSerialized] public DateTime lastSaveDate;
 
         [SerializeField] private MetaData   metaData;
         [SerializeField] private List<Data> saveData = new List<Data>();
@@ -56,6 +58,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                 creationDate = DateTime.Now;
             }
 
+            lastSaveDate = DateTime.Now;
+
+            metaData.lastSaveDate   = lastSaveDate.ToString();
             metaData.creationDate   = creationDate.ToString();
             metaData.gameVersion    = gameVersion;
             metaData.timePlayed     = timePlayed.ToString();
@@ -67,6 +72,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             gameVersion = metaData.gameVersion;
             version     = metaData.version;
 
+            DateTime.TryParse(metaData.lastSaveDate, out lastSaveDate);
             DateTime.TryParse(metaData.creationDate, out creationDate);
             TimeSpan.TryParse(metaData.timePlayed, out timePlayed);
 

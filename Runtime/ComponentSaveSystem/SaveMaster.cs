@@ -332,6 +332,26 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             return GetSaveCreationTime(activeSlot);
         }
 
+        public static DateTime GetSaveLastSaveTime(int slot)
+        {
+            if (slot == activeSlot)
+            {
+                return activeSaveGame.lastSaveDate;
+            }
+
+            if (!IsSlotUsed(slot))
+            {
+                return new DateTime();
+            }
+
+            return GetSave(slot, true).lastSaveDate;
+        }
+
+        public static DateTime GetSaveLastSaveTime()
+        {
+            return GetSaveLastSaveTime(activeSlot);
+        }
+
         public static TimeSpan GetSaveTimePlayed(int slot)
         {
             if (slot == activeSlot)
