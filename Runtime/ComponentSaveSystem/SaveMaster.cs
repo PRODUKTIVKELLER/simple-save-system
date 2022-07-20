@@ -352,7 +352,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             return GetSaveLastSaveTime(activeSlot);
         }
 
-        public void StampLastSaveTime()
+        public static void StampLastSaveTime()
         {
             if (activeSaveGame == null)
             {
