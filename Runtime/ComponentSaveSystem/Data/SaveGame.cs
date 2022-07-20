@@ -58,8 +58,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
                 creationDate = DateTime.Now;
             }
 
-            lastSaveDate = DateTime.Now;
-
             metaData.lastSaveDate   = lastSaveDate.ToString();
             metaData.creationDate   = creationDate.ToString();
             metaData.gameVersion    = gameVersion;
