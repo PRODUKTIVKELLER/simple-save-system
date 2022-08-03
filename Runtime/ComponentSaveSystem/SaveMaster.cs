@@ -991,6 +991,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
             instance = saveMasterInstance;
 
+            instance.StartCoroutine(instance.TrackTimePlayed());
+
             var settings = SaveSettings.Get();
 
             if (settings.writebackToFileDisabled)
@@ -1122,18 +1124,19 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             }
         }
 
-        private void TrackTimePlayed()
+        private IEnumerator TrackTimePlayed()
         {
             var settings = SaveSettings.Get();
 
-            if (!settings.trackTimePlayed)
+            while (true)
             {
-                return;
-            }
+                yield return new WaitForSecondsRealtime(1f);
 
-            if (activeSlot >= 0)
-            {
-                activeSaveGame.timePlayed = activeSaveGame.timePlayed.Add(TimeSpan.FromSeconds(Time.deltaTime));
+                if (settings.trackTimePlayed
+                    && activeSlot >= 0)
+                {
+                    activeSaveGame.timePlayed = activeSaveGame.timePlayed.Add(TimeSpan.FromSeconds(1f));
+                }
             }
         }
 
