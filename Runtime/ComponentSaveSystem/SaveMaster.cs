@@ -1027,11 +1027,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             InitializeIfNeccessary(this);
         }
 
-        private void Update()
-        {
-            TrackTimePlayed();
-        }
-
         private static void ValidateSaveableIDs()
         {
             List<string> saveableIDs = new List<string>();
