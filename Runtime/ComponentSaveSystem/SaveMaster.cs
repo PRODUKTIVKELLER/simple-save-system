@@ -34,6 +34,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private static SaveGame activeSaveGame = null;
         private static int activeSlot = -1;
 
+        private Coroutine _coroutineTrackedPlaytime;
+
         // All listeners
         private static List<Saveable> saveables = new List<Saveable>();
 
@@ -991,7 +993,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
             instance = saveMasterInstance;
 
-            instance.StartCoroutine(instance.TrackTimePlayed());
+            if (instance._coroutineTrackedPlaytime != null)
+            {
+                instance.StopCoroutine(instance._coroutineTrackedPlaytime);
+            }
+
+            instance._coroutineTrackedPlaytime = instance.StartCoroutine(instance.TrackTimePlayed());
 
             var settings = SaveSettings.Get();
 
@@ -1025,6 +1032,14 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private void Awake()
         {
             InitializeIfNeccessary(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance._coroutineTrackedPlaytime != null)
+            {
+                instance.StopCoroutine(instance._coroutineTrackedPlaytime);
+            }
         }
 
         private static void ValidateSaveableIDs()
@@ -1131,6 +1146,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                     && activeSlot >= 0)
                 {
                     activeSaveGame.timePlayed = activeSaveGame.timePlayed.Add(TimeSpan.FromSeconds(1f));
+
+                    if (settings.showSaveFileUtilityLog)
+                    {
+                        Debug.Log("Played time: " + activeSaveGame.timePlayed.TotalSeconds.ToString());
+                    }
                 }
             }
         }
