@@ -32,7 +32,17 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
             foreach (KeyValuePair<int, string> savePath in savePaths)
             {
                 SaveGame saveGame = SaveFileUtility.LoadSaveFromPath(savePath.Value);
-                SaveFileUtility.WriteSave(PerformMigration(saveGame), savePath.Key);
+
+                SaveGame migratedSavegame = PerformMigration(saveGame);
+
+                if (migratedSavegame != null)
+                {
+                    SaveFileUtility.WriteSave(migratedSavegame, savePath.Key);
+                }
+                else
+                {
+                    SaveFileUtility.DeleteSave(savePath.Key);
+                }
             }
 
             if (SaveSettings.Get().showSaveFileUtilityLog)

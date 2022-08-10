@@ -29,6 +29,12 @@ namespace Produktivkeller.SimpleSaveSystem.Migration.Handler
             {
                 Migration migration = FindMigration(version);
                 saveGame = migration.Migrate(saveGame);
+
+                if (saveGame == null)
+                {
+                    return null;
+                }
+
                 saveGame.AddPerformedMigrationToHistory(migration);
             }
 

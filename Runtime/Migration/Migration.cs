@@ -9,6 +9,12 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
         public ulong  version;
         public string description;
 
+        /// <summary>
+        /// Performs any migration on the given SaveGame, and returns the migrated SaveGame.
+        /// If null is returned, the file of the concerned SaveGame is deleted.
+        /// </summary>
+        /// <param name="saveGame"></param>
+        /// <returns></returns>
         public virtual SaveGame Migrate(SaveGame saveGame)
         {
             return saveGame;
