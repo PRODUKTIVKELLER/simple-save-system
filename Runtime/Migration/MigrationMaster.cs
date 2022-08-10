@@ -50,6 +50,8 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
             for (int i = 0; i < slotsScheduledToDeletion.Count; i++)
             {
                 SaveFileUtility.DeleteSave(slotsScheduledToDeletion[i]);
+
+                SaveFileUtility.MarkCachedSavePathsDirtyAsDirty();
             }
 
             if (SaveSettings.Get().showSaveFileUtilityLog)

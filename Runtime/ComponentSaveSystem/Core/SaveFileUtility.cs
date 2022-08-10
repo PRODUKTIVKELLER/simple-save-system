@@ -49,10 +49,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
         }
 
         private static Dictionary<int, string> cachedSavePaths;
+        private static bool _isCachedSavePathsDirty = false;
 
         public static Dictionary<int, string> ObtainSavePaths()
         {
-            if (cachedSavePaths != null)
+            if (cachedSavePaths != null && _isCachedSavePathsDirty == false)
             {
                 return cachedSavePaths;
             }
@@ -88,6 +89,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
             cachedSavePaths = newSavePaths;
 
             return newSavePaths;
+        }
+
+        public static void MarkCachedSavePathsDirtyAsDirty()
+        {
+            _isCachedSavePathsDirty = true;
         }
 
         public static SaveGame LoadSaveFromPath(string savePath)
