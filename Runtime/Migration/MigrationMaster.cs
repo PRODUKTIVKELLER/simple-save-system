@@ -28,6 +28,8 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
 
             InitializeMigrationHandlers();
 
+            List<int> slotsScheduledToDeletion = new List<int>();
+
             Dictionary<int, string> savePaths = SaveFileUtility.ObtainSavePaths();
             foreach (KeyValuePair<int, string> savePath in savePaths)
             {
@@ -41,8 +43,13 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
                 }
                 else
                 {
-                    SaveFileUtility.DeleteSave(savePath.Key);
+                    slotsScheduledToDeletion.Add(savePath.Key);
                 }
+            }
+
+            for (int i = 0; i < slotsScheduledToDeletion.Count; i++)
+            {
+                SaveFileUtility.DeleteSave(slotsScheduledToDeletion[i]);
             }
 
             if (SaveSettings.Get().showSaveFileUtilityLog)
