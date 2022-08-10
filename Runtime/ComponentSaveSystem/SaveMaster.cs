@@ -5,6 +5,7 @@ using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Enums;
+using Produktivkeller.SimpleSaveSystem.Migration;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -1021,6 +1022,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             {
                 instance.StartCoroutine(instance.AutoSaveGame());
             }
+
+            MigrationMaster.ProcessAllSavegames();
         }
 
         private static void InitializeIfNeccessary()
