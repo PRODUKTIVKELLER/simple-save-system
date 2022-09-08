@@ -9,7 +9,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
     /// </summary>
 
     [AddComponentMenu("Saving/Components/Save Visibility"), DisallowMultipleComponent]
-    public class SaveVisibility : MonoBehaviour, ISaveable
+    public class SaveActiveState : MonoBehaviour, ISaveable
     {
         private bool isEnabled;
 
