@@ -1,4 +1,5 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
 using System.Collections;
@@ -386,36 +387,6 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         }
 
         /// <summary>
-        /// Wipe all data of a specified scene. This is useful if you want to reset the saved state of a specific scene.
-        /// Use clearSceneSaveables = true, in case you want to clear it before switching scenes.
-        /// </summary>
-        /// <param name="name"> Name of the scene </param>
-        /// <param name="clearSceneSaveables"> Scan and wipe for any saveable in the scene? Else they might save again upon destruction.
-        /// You can leave this off for performance if you are certain no active saveables are in the scene.</param>
-        public static void WipeSceneData(string name, bool clearSceneSaveables = true)
-        {
-            if (activeSaveGame == null)
-            {
-                Debug.LogError("Failed to wipe scene data: No save game loaded.");
-                return;
-            }
-
-            if (clearSceneSaveables)
-            {
-                int listenerCount = saveables.Count;
-                for (int i = listenerCount - 1; i >= 0; i--)
-                {
-                    if (saveables[i].gameObject.scene.name == name)
-                    {
-                        saveables[i].WipeData(activeSaveGame);
-                    }
-                }
-            }
-
-            activeSaveGame.WipeSceneData(name);
-        }
-
-        /// <summary>
         /// Wipe all data of the currently active savegame.
         /// </summary>
         public static void WipeAllData()
@@ -698,7 +669,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetInt(string key, int value)
         {
             if (HasActiveSaveLogAction("Set Int") == false) return;
-            activeSaveGame.Set(string.Format("IVar-{0}", key), value.ToString(), "Global");
+            activeSaveGame.Set(string.Format("IVar-{0}", key), value.ToString());
         }
 
         /// <summary>
@@ -722,7 +693,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetFloat(string key, float value)
         {
             if (HasActiveSaveLogAction("Set Float") == false) return;
-            activeSaveGame.Set(string.Format("FVar-{0}", key), value.ToString(), "Global");
+            activeSaveGame.Set(string.Format("FVar-{0}", key), value.ToString());
         }
 
         /// <summary>
@@ -746,7 +717,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetBool(string key, bool value)
         {
             if (HasActiveSaveLogAction("Set Bool") == false) return;
-            activeSaveGame.Set(string.Format("BVar-{0}", key), value.ToString(), "Global");
+            activeSaveGame.Set(string.Format("BVar-{0}", key), value.ToString());
         }
 
         /// <summary>
@@ -770,7 +741,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetString(string key, string value)
         {
             if (HasActiveSaveLogAction("Set String") == false) return;
-            activeSaveGame.Set(string.Format("SVar-{0}", key), value, "Global");
+            activeSaveGame.Set(string.Format("SVar-{0}", key), value);
         }
 
         /// <summary>
@@ -975,11 +946,6 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 if (!settings.useHotkeys)
                 {
                     continue;
-                }
-
-                if (Input.GetKeyDown(settings.wipeActiveSceneData))
-                {
-                    SaveMaster.WipeSceneData(SceneManager.GetActiveScene().name);
                 }
 
                 if (Input.GetKeyDown(settings.saveAndWriteToDiskKey))

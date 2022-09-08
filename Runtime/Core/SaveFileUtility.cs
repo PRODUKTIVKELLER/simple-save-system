@@ -1,4 +1,5 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System.Collections.Generic;
 using System.IO;

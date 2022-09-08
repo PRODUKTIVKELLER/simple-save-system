@@ -1,3 +1,4 @@
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -281,7 +282,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
                     if (!string.IsNullOrEmpty(dataString))
                     {
-                        saveGame.Set(getIdentification, dataString, "Global");
+                        saveGame.Set(getIdentification, dataString);
                     }
                 }
             }

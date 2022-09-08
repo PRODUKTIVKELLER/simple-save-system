@@ -4,7 +4,7 @@ using UnityEngine;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System.Globalization;
 
-namespace Produktivkeller.SimpleSaveSystem.Core
+namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 {
     /// <summary>
     /// Container for all saved data.
@@ -13,43 +13,20 @@ namespace Produktivkeller.SimpleSaveSystem.Core
     [Serializable]
     public class SaveGame
     {
-        [Serializable]
-        public struct MetaData
-        {
-            public ulong    version;
-            public string[] migrationHistory;
-            public int      gameVersion;
-            public string   creationDate;
-            public string   lastSaveDate;
-            public string   timePlayed;
-        }
-
-        [Serializable]
-        public struct Data
-        {
-            public string guid;
-            public string data;
-            public string scene;
-        }
-
         [NonSerialized] public TimeSpan timePlayed;
         [NonSerialized] public int      gameVersion;
         [NonSerialized] public ulong    version;
         [NonSerialized] public DateTime creationDate;
         [NonSerialized] public DateTime lastSaveDate;
 
-        [SerializeField] private MetaData   metaData;
-        [SerializeField] private List<Data> saveData = new List<Data>();
+        [SerializeField] private MetaData           metaData;
+        [SerializeField] private List<SaveableData> saveData = new List<SaveableData>();
 
         // Stored in dictionary for quick lookup
         [NonSerialized]
         private Dictionary<string, int> saveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
 
         [NonSerialized] private bool loaded;
-
-        // Used to track which save ids are assigned to a specific scene
-        // This makes it posible to wipe all data from a specific scene.
-        [NonSerialized] private Dictionary<string, List<string>> sceneObjectIDS = new Dictionary<string, List<string>>();
 
         public void OnWrite()
         {
@@ -87,41 +64,15 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 for (int i = 0; i < saveData.Count; i++)
                 {
                     saveDataCache.Add(saveData[i].guid, i);
-                    AddSceneID(saveData[i].scene, saveData[i].guid);
                 }
-            }
-        }
-
-        public void WipeSceneData(string sceneName)
-        {
-            List<string> value;
-            if (sceneObjectIDS.TryGetValue(sceneName, out value))
-            {
-                int elementCount = value.Count;
-                for (int i = elementCount - 1; i >= 0; i--)
-                {
-                    Remove(value[i]);
-                    value.RemoveAt(i);
-                }
-            }
-            else
-            {
-                Debug.Log("Scene is already wiped!");
             }
         }
 
         public void WipeAllData()
         {
-            List<string> allKeys = new List<string>(sceneObjectIDS.Keys);
-
-            for (int i = 0; i < allKeys.Count; i++)
+            foreach (KeyValuePair<string, int> keyValuePair in saveDataCache)
             {
-                List<string> dataKeys = sceneObjectIDS[allKeys[i]];
-
-                for (int j = 0; j < dataKeys.Count; j++)
-                {
-                    Remove(dataKeys[j]);
-                }
+                Remove(keyValuePair.Key);
             }
         }
 
@@ -132,9 +83,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             if (saveDataCache.TryGetValue(id, out saveIndex))
             {
                 // Zero out the string data, it will be wiped on next cache initialization.
-                saveData[saveIndex] = new Data();
+                saveData[saveIndex] = new SaveableData();
                 saveDataCache.Remove(id);
-                sceneObjectIDS.Remove(id);
             }
         }
 
@@ -143,37 +93,29 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// </summary>
         /// <param name="id"> Save Identification </param>
         /// <param name="data"> Data in a string format </param>
-        public void Set(string id, string data, string scene)
+        public void Set(string id, string data)
         {
             int saveIndex;
 
             if (saveDataCache.TryGetValue(id, out saveIndex))
             {
-                saveData[saveIndex] = new Data()
+                saveData[saveIndex] = new SaveableData()
                 {
                     guid = id,
                     data = data,
-                    scene = scene,
                 };
             }
             else
             {
-                Data newSaveData = new Data()
+                SaveableData newSaveData = new SaveableData()
                 {
                     guid = id,
                     data = data,
-                    scene = scene,
                 };
 
                 saveData.Add(newSaveData);
                 saveDataCache.Add(id, saveData.Count - 1);
-                AddSceneID(scene, id);
             }
-        }
-
-        public void Set(string id, string data)
-        {
-            Set(id, data, "Global");
         }
 
         /// <summary>
@@ -192,27 +134,6 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             else
             {
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Adds the index to a list that is identifyable by scene
-        /// Makes it easy to remove save data related to a scene name.
-        /// </summary>
-        /// <param name="scene"></param>
-        /// <param name="index"></param>
-        private void AddSceneID(string scene, string id)
-        {
-            List<string> value;
-            if (sceneObjectIDS.TryGetValue(scene, out value))
-            {
-                value.Add(id);
-            }
-            else
-            {
-                List<string> list = new List<string>();
-                list.Add(id);
-                sceneObjectIDS.Add(scene, list);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using Produktivkeller.SimpleSaveSystem.Core;
+﻿using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Migration.Migrations

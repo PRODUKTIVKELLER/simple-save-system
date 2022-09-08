@@ -155,7 +155,6 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
         public KeyCode saveAndWriteToDiskKey = KeyCode.F2;
         public KeyCode syncSaveGameKey = KeyCode.F4;
         public KeyCode syncLoadGameKey = KeyCode.F5;
-        public KeyCode wipeActiveSceneData = KeyCode.F6;
 
         [Header("Debug (Unity Editor Only)")]
         public bool showSaveFileUtilityLog = false;
