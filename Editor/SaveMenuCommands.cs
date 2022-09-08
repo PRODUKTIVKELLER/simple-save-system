@@ -1,6 +1,6 @@
-﻿using System.IO;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
+﻿using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;

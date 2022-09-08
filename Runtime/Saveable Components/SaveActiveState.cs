@@ -1,7 +1,7 @@
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Interfaces;
+using Produktivkeller.SimpleSaveSystem.Core;
 using UnityEngine;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
+namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
 {
     /// <summary>
     /// Example class of how to store the visability of an object.

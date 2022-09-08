@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Interfaces;
 using UnityEngine;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
+namespace Produktivkeller.SimpleSaveSystem.Core
 {
     /// <summary>
     /// Attach this to the root of an object that you want to save

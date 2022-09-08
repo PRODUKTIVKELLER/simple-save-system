@@ -1,5 +1,5 @@
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
+using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core;
 using Produktivkeller.SimpleSaveSystem.Migration.Handler;
 using System.Collections.Generic;
 using UnityEngine;

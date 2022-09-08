@@ -1,5 +1,5 @@
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Interfaces
+namespace Produktivkeller.SimpleSaveSystem.Core
 {
     public interface ISaveable
     {

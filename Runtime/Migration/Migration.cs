@@ -1,4 +1,4 @@
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
+using Produktivkeller.SimpleSaveSystem.Core;
 using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Migration

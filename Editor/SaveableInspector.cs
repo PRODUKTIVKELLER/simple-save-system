@@ -1,4 +1,4 @@
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components;
+using Produktivkeller.SimpleSaveSystem.Core;
 using UnityEditor;
 using UnityEngine;
 

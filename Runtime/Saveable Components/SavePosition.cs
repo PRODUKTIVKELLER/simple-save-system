@@ -1,8 +1,8 @@
+using Produktivkeller.SimpleSaveSystem.Core;
 using System;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Interfaces;
 using UnityEngine;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components
+namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
 {
     /// <summary>
     /// Example class of how to store a position.

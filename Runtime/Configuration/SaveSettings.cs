@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
+namespace Produktivkeller.SimpleSaveSystem.Configuration
 {
     public class SaveSettings : ScriptableObject
     {

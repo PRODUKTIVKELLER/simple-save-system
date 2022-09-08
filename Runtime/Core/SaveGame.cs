@@ -4,7 +4,7 @@ using UnityEngine;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System.Globalization;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
+namespace Produktivkeller.SimpleSaveSystem.Core
 {
     /// <summary>
     /// Container for all saved data.

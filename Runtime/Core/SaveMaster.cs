@@ -1,15 +1,12 @@
+using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
-using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Enums;
-using Produktivkeller.SimpleSaveSystem.Migration;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
+namespace Produktivkeller.SimpleSaveSystem.Core
 {
     /// <summary>
     /// Responsible for notifying all Saveable components
@@ -25,9 +22,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         // Used to track duplicate scenes.
         private static Dictionary<string, int> loadedSceneNames = new Dictionary<string, int>();
         private static HashSet<int> duplicatedSceneHandles = new HashSet<int>();
-
-        private static Dictionary<int, SaveInstanceManager> saveInstanceManagers
-            = new Dictionary<int, SaveInstanceManager>();
 
         private static bool isQuittingGame;
 
@@ -75,11 +69,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                     loadedSceneNames.Remove(scene.name);
                 }
             }
-
-            if (saveInstanceManagers.ContainsKey(scene.GetHashCode()))
-            {
-                saveInstanceManagers.Remove(scene.GetHashCode());
-            }
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode arg1)
@@ -103,54 +92,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             {
                 return;
             }
-
-            if (!saveInstanceManagers.ContainsKey(scene.GetHashCode()))
-            {
-                var instanceManager = SpawnInstanceManager(scene);
-            }
-        }
-
-        /// <summary>
-        /// You only need to call this for scenes with a duplicate name. If you have a duplicate ID, you can then 
-        /// assign a ID to it. And it will save the data of the saveable to that ID instead.
-        /// </summary>
-        /// <param name="scene">  </param>
-        /// <param name="id"> Add a extra indentification for the scene. Useful for duplicated scenes. </param>
-        /// <returns></returns>
-        public static SaveInstanceManager SpawnInstanceManager(Scene scene, string id = "")
-        {
-            // Safety precautions.
-            if (!string.IsNullOrEmpty(id) && duplicatedSceneHandles.Contains(scene.GetHashCode()))
-            {
-                duplicatedSceneHandles.Remove(scene.GetHashCode());
-            }
-
-            // Already exists
-            if (saveInstanceManagers.ContainsKey(scene.GetHashCode()))
-            {
-                return null;
-            }
-
-            // We spawn a game object seperately, so we can keep it disabled during configuration.
-            // This prevents any UnityEngine calls such as Awake or Start
-            var go = new GameObject("Save Instance Manager");
-            go.gameObject.SetActive(false);
-
-            var instanceManager = go.AddComponent<SaveInstanceManager>();
-            var saveable = go.AddComponent<Saveable>();
-            SceneManager.MoveGameObjectToScene(go, scene);
-
-            string saveID = string.IsNullOrEmpty(id) ? scene.name : string.Format("{0}-{1}", scene.name, id);
-
-            saveable.SaveIdentification = string.Format("{0}-{1}", "SaveMaster", saveID);
-            saveable.AddSaveableComponent("IM", instanceManager, true);
-            saveInstanceManagers.Add(scene.GetHashCode(), instanceManager);
-
-            instanceManager.SceneID = saveID;
-            instanceManager.Saveable = saveable;
-
-            go.gameObject.SetActive(true);
-            return instanceManager;
         }
 
         /// <summary>
@@ -285,11 +226,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             if (SaveSettings.Get().autoSaveOnSlotSwitch && activeSaveGame != null)
             {
                 WriteActiveSaveToDisk();
-            }
-
-            if (SaveSettings.Get().cleanSavedPrefabsOnSlotSwitch)
-            {
-                ClearActiveSavedPrefabs();
             }
 
             if (slot < 0 || slot > SaveSettings.Get().maxSaveSlotCount)
@@ -695,43 +631,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         }
 
         /// <summary>
-        /// Spawn a prefab that will be tracked & saved for a specific scene.
-        /// </summary>
-        /// <param name="source">Methodology to know where prefab came from </param>
-        /// <param name="filePath">This is used to retrieve the prefab again from the designated source. </param>
-        /// <param name="scene">Saved prefabs are bound to a specific scene. Easiest way to reference is by passing through (gameObject.scene).
-        /// By default is uses the active scene. </param>
-        /// <returns> Instance of saved prefab. </returns>
-        public static GameObject SpawnSavedPrefab(InstanceSource source, string filePath, Scene scene = default(Scene))
-        {
-            if (!HasActiveSaveLogAction("Spawning Object"))
-            {
-                return null;
-            }
-
-            // If no scene has been specified, it will use the current active scene.
-            if (scene == default(Scene))
-            {
-                scene = SceneManager.GetActiveScene();
-            } 
-
-            if (duplicatedSceneHandles.Contains(scene.GetHashCode()))
-            {
-                Debug.Log(string.Format("Following scene has a duplicate name: {0}. " +
-                    "Ensure to call SaveMaster.SpawnInstanceManager(scene, id) with a custom ID after spawning the scene.", scene.name));
-                scene = SceneManager.GetActiveScene();
-            }
-
-            SaveInstanceManager saveIM;
-            if (!saveInstanceManagers.TryGetValue(scene.GetHashCode(), out saveIM))
-            {
-                saveIM = SpawnInstanceManager(scene);
-            }
-
-            return saveIM.SpawnObject(source, filePath).gameObject;
-        }
-
-        /// <summary>
         /// Helper method for obtaining specific Saveable data.
         /// </summary>
         /// <typeparam name="T"> Object type to retrieve </typeparam>
@@ -896,25 +795,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                 return false;
             }
             else return true;
-        }
-
-        /// <summary>
-        /// Clean all currently saved prefabs. Useful when switching scenes.
-        /// </summary>
-        private static void ClearActiveSavedPrefabs()
-        {
-            int totalLoadedScenes = SceneManager.sceneCount;
-
-            for (int i = 0; i < totalLoadedScenes; i++)
-            {
-                Scene scene = SceneManager.GetSceneAt(i);
-                SaveInstanceManager saveIM;
-
-                if (saveInstanceManagers.TryGetValue(scene.GetHashCode(), out saveIM))
-                {
-                    saveIM.DestroyAllObjects();
-                }
-            }
         }
 
         private static bool AreSaveableIDsUnique()
