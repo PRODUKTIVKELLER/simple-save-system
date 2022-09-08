@@ -272,7 +272,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 }
                 else
                 {
-                    if (!hasStateReset && !getSaveable.OnSaveCondition())
+                    if (!hasStateReset && !getSaveable.OnShouldBeSaved())
                     {
                         continue;
                     }
@@ -330,6 +330,10 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                     if (!string.IsNullOrEmpty(getData))
                     {
                         getSaveable.OnLoad(getData);
+                    }
+                    else
+                    {
+                        getSaveable.OnNoDataToLoad();
                     }
                 }
             }

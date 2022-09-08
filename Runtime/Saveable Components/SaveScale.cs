@@ -25,13 +25,18 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             lastScale = this.transform.localScale;
         }
 
+        public void OnNoDataToLoad()
+        {
+
+        }
+
         public string OnSave()
         {
             lastScale = this.transform.localScale;
             return JsonUtility.ToJson(new SaveData() { scale = this.transform.localScale });
         }
 
-        public bool OnSaveCondition()
+        public bool OnShouldBeSaved()
         {
             return lastScale != this.transform.localScale;
         }

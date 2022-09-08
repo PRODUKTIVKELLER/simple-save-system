@@ -26,13 +26,18 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             this.transform.rotation = Quaternion.Euler(lastRotation);
         }
 
+        public void OnNoDataToLoad()
+        {
+
+        }
+
         public string OnSave()
         {
             lastRotation = activeRotation;
             return JsonUtility.ToJson(new SaveData() { rotation = this.transform.rotation.eulerAngles });
         }
 
-        public bool OnSaveCondition()
+        public bool OnShouldBeSaved()
         {
             activeRotation = this.transform.rotation.eulerAngles;
             return lastRotation != activeRotation;

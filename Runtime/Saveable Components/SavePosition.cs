@@ -27,13 +27,18 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             lastPosition = pos;
         }
 
+        public void OnNoDataToLoad()
+        {
+
+        }
+
         public string OnSave()
         {
             lastPosition = transform.position;
             return JsonUtility.ToJson(new SaveData { position = lastPosition });
         }
 
-        public bool OnSaveCondition()
+        public bool OnShouldBeSaved()
         {
             return lastPosition != transform.position;
         }

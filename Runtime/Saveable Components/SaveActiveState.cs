@@ -34,12 +34,17 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             gameObject.SetActive(isEnabled);
         }
 
+        public void OnNoDataToLoad()
+        {
+
+        }
+
         public string OnSave()
         {
             return isEnabled ? "1" : "0";
         }
 
-        public bool OnSaveCondition()
+        public bool OnShouldBeSaved()
         {
             return true;
         }
