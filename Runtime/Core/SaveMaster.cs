@@ -839,6 +839,11 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 return;
             }
 
+            if (instance != null && instance.GetInstanceID() == saveMasterInstance.GetInstanceID())
+            {
+                return;
+            }
+
             instance = saveMasterInstance;
 
             if (instance._coroutineTrackedPlaytime != null)

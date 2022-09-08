@@ -1,5 +1,6 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
+using Produktivkeller.SimpleSaveSystem.Jobs;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +29,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         private static string gameFileName { get { return SaveSettings.Get().fileName; } }
 
         private static bool debugMode { get { return SaveSettings.Get().showSaveFileUtilityLog; } }
+
+        private static WritebackSaveGameJob _writebackSaveGameJob = null;
 
         private static string DataPath
         {
@@ -231,12 +234,31 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             saveGame.OnWrite();
 
-            using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
+            if (SaveSettings.Get().useMultiThreadedWriteback)
             {
-                var jsonString = JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint);
+                if (_writebackSaveGameJob != null && _writebackSaveGameJob.IsDone == false)
+                {
+                    Debug.Log("Skipped saving, due to running job");
+                }
+                else
+                {
+                    Debug.Log("Started writeback job");
 
-                writer.Write(jsonString);
+                    _writebackSaveGameJob = new WritebackSaveGameJob();
+                    _writebackSaveGameJob.savePath = savePath;
+                    _writebackSaveGameJob.saveGame = saveGame;
+
+                    _writebackSaveGameJob.Start();
+                }
             }
+            else
+            {
+                using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
+                {
+                    writer.Write(JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint));
+                }
+            }
+
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         SyncFiles();

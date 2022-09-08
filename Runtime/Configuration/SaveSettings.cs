@@ -112,6 +112,7 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
         public string fileFolderNameEditor = "SaveData Editor";
         public string fileName = "Slot";
         public bool useJsonPrettyPrint = true;
+        public bool useMultiThreadedWriteback = true;
 
         [Header("Configuration")]
         [Range(1, 300)]
