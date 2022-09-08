@@ -669,7 +669,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetInt(string key, int value)
         {
             if (HasActiveSaveLogAction("Set Int") == false) return;
-            activeSaveGame.Set(string.Format("IVar-{0}", key), value.ToString());
+            activeSaveGame.SetPrimitive(key, value);
         }
 
         /// <summary>
@@ -681,8 +681,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static int GetInt(string key, int defaultValue = -1)
         {
             if (HasActiveSaveLogAction("Get Int") == false) return defaultValue;
-            var getData = activeSaveGame.Get(string.Format("IVar-{0}", key));
-            return string.IsNullOrEmpty((getData)) ? defaultValue : int.Parse(getData);
+            return activeSaveGame.GetPrimitive<int>(key);
         }
 
         /// <summary>
@@ -693,7 +692,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetFloat(string key, float value)
         {
             if (HasActiveSaveLogAction("Set Float") == false) return;
-            activeSaveGame.Set(string.Format("FVar-{0}", key), value.ToString());
+            activeSaveGame.SetPrimitive(key, value);
         }
 
         /// <summary>
@@ -705,8 +704,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static float GetFloat(string key, float defaultValue = -1)
         {
             if (HasActiveSaveLogAction("Get Float") == false) return defaultValue;
-            var getData = activeSaveGame.Get(string.Format("FVar-{0}", key));
-            return string.IsNullOrEmpty((getData)) ? defaultValue : float.Parse(getData);
+            return activeSaveGame.GetPrimitive<float>(key);
         }
 
         /// <summary>
@@ -717,7 +715,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetBool(string key, bool value)
         {
             if (HasActiveSaveLogAction("Set Bool") == false) return;
-            activeSaveGame.Set(string.Format("BVar-{0}", key), value.ToString());
+            activeSaveGame.SetPrimitive(key, value);
         }
 
         /// <summary>
@@ -729,8 +727,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static bool GetBool(string key, bool defaultValue = false)
         {
             if (HasActiveSaveLogAction("Get Bool") == false) return defaultValue;
-            var getData = activeSaveGame.Get(string.Format("BVar-{0}", key));
-            return string.IsNullOrEmpty((getData)) ? defaultValue : bool.Parse(getData);
+            return activeSaveGame.GetPrimitive<bool>(key);
         }
 
         /// <summary>
@@ -741,7 +738,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static void SetString(string key, string value)
         {
             if (HasActiveSaveLogAction("Set String") == false) return;
-            activeSaveGame.Set(string.Format("SVar-{0}", key), value);
+            activeSaveGame.SetPrimitive(key, value);
         }
 
         /// <summary>
@@ -753,8 +750,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         public static string GetString(string key, string defaultValue = "")
         {
             if (HasActiveSaveLogAction("Get String") == false) return defaultValue;
-            var getData = activeSaveGame.Get(string.Format("SVar-{0}", key));
-            return string.IsNullOrEmpty((getData)) ? defaultValue : getData;
+            return activeSaveGame.GetPrimitive<string>(key);
         }
 
         private static bool HasActiveSaveLogAction(string action)

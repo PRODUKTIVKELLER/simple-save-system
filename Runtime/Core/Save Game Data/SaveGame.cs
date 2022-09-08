@@ -1,8 +1,8 @@
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.Primitives;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Produktivkeller.SimpleSaveSystem.Migration;
 using System.Globalization;
+using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 {
@@ -19,12 +19,14 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
         [NonSerialized] public DateTime creationDate;
         [NonSerialized] public DateTime lastSaveDate;
 
-        [SerializeField] private MetaData           metaData;
-        [SerializeField] private List<SaveableData> saveData = new List<SaveableData>();
+        [SerializeField] private MetaData            metaData;
+        [SerializeField] private List<SaveableData>  saveData      = new List<SaveableData>();
+        [SerializeField] private List<PrimitiveData> primitiveData = new List<PrimitiveData>();
 
         // Stored in dictionary for quick lookup
         [NonSerialized]
-        private Dictionary<string, int> saveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
+        private Dictionary<string, int> saveDataCache      = new Dictionary<string, int>(StringComparer.Ordinal);
+        private Dictionary<string, int> primitiveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
 
         [NonSerialized] private bool loaded;
 
@@ -65,6 +67,11 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 {
                     saveDataCache.Add(saveData[i].guid, i);
                 }
+
+                for (int i = 0; i < primitiveData.Count; i++)
+                {
+                    primitiveDataCache.Add(primitiveData[i].guid, i);
+                }
             }
         }
 
@@ -85,6 +92,59 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 // Zero out the string data, it will be wiped on next cache initialization.
                 saveData[saveIndex] = new SaveableData();
                 saveDataCache.Remove(id);
+            }
+        }
+
+        public void RemovePrimitive(string id)
+        {
+            int saveIndex;
+
+            if (primitiveDataCache.TryGetValue(id, out saveIndex))
+            {
+                // Zero out the string data, it will be wiped on next cache initialization.
+                primitiveData[saveIndex] = new PrimitiveData();
+                primitiveDataCache.Remove(id);
+            }
+        }
+
+        public void SetPrimitive(string id, object data)
+        {
+            int saveIndex;
+
+            if (primitiveDataCache.TryGetValue(id, out saveIndex))
+            {
+                primitiveData[saveIndex] = new PrimitiveData()
+                {
+                    data = PrimitivesParser.ToPrimitiveData(data),
+                    guid = id,
+                    type = PrimitiveTypeExtensions.FromType(data.GetType()).ToInt(),
+                };
+            }
+            else
+            {
+                PrimitiveData newPrimitiveData = new PrimitiveData()
+                {
+                    data = PrimitivesParser.ToPrimitiveData(data),
+                    guid = id,
+                    type = PrimitiveTypeExtensions.FromType(data.GetType()).ToInt(),
+                };
+
+                primitiveData.Add(newPrimitiveData);
+                primitiveDataCache.Add(id, primitiveData.Count - 1);
+            }
+        }
+
+        public T GetPrimitive<T>(string id)
+        {
+            int saveIndex;
+
+            if (primitiveDataCache.TryGetValue(id, out saveIndex))
+            {
+                return PrimitivesParser.Parse<T>(primitiveData[saveIndex].data, PrimitiveTypeExtensions.FromInt(primitiveData[saveIndex].type));
+            }
+            else
+            {
+                return default(T);
             }
         }
 
