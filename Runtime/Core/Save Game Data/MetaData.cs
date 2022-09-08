@@ -9,7 +9,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
     [Serializable]
     public struct MetaData
     {
-        public ulong    version;
+        public ulong    migrationVersion;
         public string[] migrationHistory;
         public int      gameVersion;
         public string   creationDate;

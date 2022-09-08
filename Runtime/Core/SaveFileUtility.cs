@@ -194,8 +194,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                     Log(string.Format("Creating save at slot {0}", slot));
 
                     SaveGame saveGame = new SaveGame();
-                    saveGame.version = MigrationMaster.GetMostRecentMigrationVersion();
-                    saveGame.AddCreationVersionToMigrationHistory(saveGame.version);
+
+                    saveGame.migrationVersion = MigrationMaster.GetMostRecentMigrationVersion();
+                    saveGame.AddCreationVersionToMigrationHistory(saveGame.migrationVersion);
 
                     WriteSave(saveGame, slot);
 

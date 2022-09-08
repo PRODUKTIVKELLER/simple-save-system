@@ -129,22 +129,6 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
         [Tooltip("Time interval in seconds before the autosave happens"), Range(1, 3000)]
         public int saveIntervalTime = 1;
 
-        [Header("Saveable")]
-        [Tooltip("Will do a check if object has already been instantiated with the ID")]
-        public bool resetSaveableIdOnDuplicate = true;
-        [Tooltip("Will do a check if object is serialized under a different scene name")]
-        public bool resetSaveableIdOnNewScene = false;
-        [Tooltip("Default generated guid length for a game object")]
-        [Range(5,36)]
-        public int gameObjectGuidLength = 5;
-        [Tooltip("Default generated guid length for a component")]
-        [Range(5, 36)]
-        public int componentGuidLength = 5;
-
-        [Header("Saveable Prefabs")]
-        [Tooltip("Automatically remove saved instances when changing slots")]
-        public bool cleanSavedPrefabsOnSlotSwitch = true;
-
         [Header("Initialization")]
         public bool loadDefaultSlotOnStart = true;
         [Range(0, 299)]

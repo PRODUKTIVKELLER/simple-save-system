@@ -15,8 +15,8 @@ namespace Produktivkeller.SimpleSaveSystem.Migration.Handler
 
         public SaveGame Migrate(SaveGame saveGame)
         {
-            ulong saveGameVersion = saveGame.version;
-            ulong currentVersion = MigrationMaster.GetMostRecentMigrationVersion();
+            ulong saveGameVersion = saveGame.migrationVersion;
+            ulong currentVersion  = MigrationMaster.GetMostRecentMigrationVersion();
 
             if (SaveSettings.Get().showSaveFileUtilityLog
                 && currentVersion > saveGameVersion)
@@ -37,7 +37,7 @@ namespace Produktivkeller.SimpleSaveSystem.Migration.Handler
                 saveGame.AddPerformedMigrationToHistory(migration);
             }
 
-            saveGame.version = currentVersion;
+            saveGame.migrationVersion = currentVersion;
             return saveGame;
         }
 
