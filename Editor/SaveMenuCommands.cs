@@ -9,7 +9,7 @@ namespace Produktivkeller.SimpleSaveSystem.Editor
 {
     public class SaveMenuCommands
     {
-        [UnityEditor.MenuItem(itemName: "Saving/Open Save Location")]
+        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Open Save Location")]
         public static void OpenSaveLocation()
         {
             string dataPath = string.Format("{0}/{1}/", Application.persistentDataPath, SaveSettings.Get().fileFolderName);
@@ -28,13 +28,13 @@ namespace Produktivkeller.SimpleSaveSystem.Editor
             EditorUtility.RevealInFinder(dataPath);
         }
 
-        [MenuItem("Saving/Open Save Settings")]
+        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Open Save Settings")]
         public static void OpenSaveSystemSettings()
         {
             Selection.activeInstanceID = SaveSettings.Get().GetInstanceID();
         }
 
-        [MenuItem("Saving/Utility/Wipe Save Identifications (Active Scene)")]
+        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Utility/Wipe Save Identifications (Active Scene)")]
         public static void WipeSceneSaveIdentifications()
         {
             var activeScene = EditorSceneManager.GetActiveScene();
@@ -52,7 +52,7 @@ namespace Produktivkeller.SimpleSaveSystem.Editor
             }
         }
 
-        [MenuItem("Saving/Utility/Wipe Save Identifications (Active Selection(s))")]
+        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Utility/Wipe Save Identifications (Active Selection(s))")]
         public static void WipeActiveSaveIdentifications()
         {
             foreach (GameObject obj in Selection.gameObjects)
