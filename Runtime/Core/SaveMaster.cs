@@ -668,7 +668,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="value"> Value to store </param>
         public static void SetInt(string key, int value)
         {
-            if (HasActiveSaveLogAction("Set Int") == false) return;
+            if (HasActiveSaveSlot() == false) return;
             activeSaveGame.SetPrimitive(key, value);
         }
 
@@ -680,7 +680,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns> Stored value </returns>
         public static int GetInt(string key, int defaultValue = -1)
         {
-            if (HasActiveSaveLogAction("Get Int") == false) return defaultValue;
+            if (HasActiveSaveSlot() == false) return defaultValue;
             return activeSaveGame.GetPrimitive<int>(key);
         }
 
@@ -691,7 +691,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="value"> Value to store </param>
         public static void SetFloat(string key, float value)
         {
-            if (HasActiveSaveLogAction("Set Float") == false) return;
+            if (HasActiveSaveSlot() == false) return;
             activeSaveGame.SetPrimitive(key, value);
         }
 
@@ -703,7 +703,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns> Stored value </returns>
         public static float GetFloat(string key, float defaultValue = -1)
         {
-            if (HasActiveSaveLogAction("Get Float") == false) return defaultValue;
+            if (HasActiveSaveSlot() == false) return defaultValue;
             return activeSaveGame.GetPrimitive<float>(key);
         }
 
@@ -714,7 +714,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="value"> Value to store </param>
         public static void SetBool(string key, bool value)
         {
-            if (HasActiveSaveLogAction("Set Bool") == false) return;
+            if (HasActiveSaveSlot() == false) return;
             activeSaveGame.SetPrimitive(key, value);
         }
 
@@ -726,7 +726,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns> Stored value </returns>
         public static bool GetBool(string key, bool defaultValue = false)
         {
-            if (HasActiveSaveLogAction("Get Bool") == false) return defaultValue;
+            if (HasActiveSaveSlot() == false) return defaultValue;
             return activeSaveGame.GetPrimitive<bool>(key);
         }
 
@@ -737,7 +737,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="value"> Value to store </param>
         public static void SetString(string key, string value)
         {
-            if (HasActiveSaveLogAction("Set String") == false) return;
+            if (HasActiveSaveSlot() == false) return;
             activeSaveGame.SetPrimitive(key, value);
         }
 
@@ -749,16 +749,15 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns> Stored value </returns>
         public static string GetString(string key, string defaultValue = "")
         {
-            if (HasActiveSaveLogAction("Get String") == false) return defaultValue;
+            if (HasActiveSaveSlot() == false) return defaultValue;
             return activeSaveGame.GetPrimitive<string>(key);
         }
 
-        private static bool HasActiveSaveLogAction(string action)
+        private static bool HasActiveSaveSlot()
         {
             if (SaveMaster.GetActiveSlot() == -1)
             {
-                Debug.LogWarning(string.Format("{0} Failed: no save slot set. Please call SetSaveSlot(int index)",
-                    action));
+                Debug.LogWarning("Failed: no save slot set. Please call SetSaveSlot(int index)");
                 return false;
             }
             else return true;
