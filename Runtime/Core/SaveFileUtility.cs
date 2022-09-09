@@ -238,15 +238,13 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             {
                 if (_writebackSaveGameJob != null && _writebackSaveGameJob.IsDone == false)
                 {
-                    Debug.Log("Skipped saving, due to running job");
+                    Debug.Log("Skipped saving, due to running job.");
                 }
                 else
                 {
-                    Debug.Log("Started writeback job");
+                    Debug.Log("Started writeback job.");
 
-                    _writebackSaveGameJob = new WritebackSaveGameJob();
-                    _writebackSaveGameJob.savePath = savePath;
-                    _writebackSaveGameJob.saveGame = saveGame;
+                    _writebackSaveGameJob = new WritebackSaveGameJob(savePath, saveGame);
 
                     _writebackSaveGameJob.Start();
                 }
@@ -255,7 +253,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             {
                 using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
                 {
-                    writer.Write(JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint));
+                    writer.Write(JsonUtility.ToJson(saveGame, true));
                 }
             }
 

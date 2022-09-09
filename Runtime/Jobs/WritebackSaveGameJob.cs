@@ -12,17 +12,23 @@ namespace Produktivkeller.SimpleSaveSystem.Jobs
 {
     public class WritebackSaveGameJob : ThreadedJob
     {
-        public string   savePath;
-        public SaveGame saveGame;
+        private string   _savePath;
+        private SaveGame _saveGame;
+
+        public WritebackSaveGameJob(string savePath, SaveGame saveGame)
+        {
+            _savePath = savePath;
+            _saveGame = saveGame;
+        }
 
         protected override void ThreadFunction()
         {
-            SaveGame saveGameToStore = saveGame;
-            string   savePathToStore = savePath;
+            SaveGame saveGameToStore = _saveGame;
+            string   savePathToStore = _savePath;
 
             using (var writer = new BinaryWriter(File.Open(savePathToStore, FileMode.Create)))
             {
-                writer.Write(JsonUtility.ToJson(saveGameToStore, SaveSettings.Get().useJsonPrettyPrint));
+                writer.Write(JsonUtility.ToJson(saveGameToStore, true));
             }
         }
     }
