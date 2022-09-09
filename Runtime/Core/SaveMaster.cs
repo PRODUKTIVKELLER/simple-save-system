@@ -322,7 +322,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             return GetSaveTimePlayed(activeSlot);
         }
 
-        public static int GetSaveVersion(int slot)
+        public static string GetSaveVersion(int slot)
         {
             if (slot == activeSlot)
             {
@@ -331,13 +331,13 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             if (!IsSlotUsed(slot))
             {
-                return -1;
+                return "";
             }
 
             return GetSave(slot, true).gameVersion;
         }
 
-        public static int GetSaveVersion()
+        public static string GetSaveVersion()
         {
             return GetSaveVersion(activeSlot);
         }

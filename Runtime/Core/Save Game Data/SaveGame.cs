@@ -14,7 +14,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
     public class SaveGame
     {
         [NonSerialized] public TimeSpan timePlayed;
-        [NonSerialized] public int      gameVersion;
+        [NonSerialized] public string   gameVersion;
         [NonSerialized] public ulong    migrationVersion;
         [NonSerialized] public DateTime creationDate;
         [NonSerialized] public DateTime lastSaveDate;
