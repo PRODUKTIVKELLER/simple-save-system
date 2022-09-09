@@ -20,15 +20,24 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
         [NonSerialized] public DateTime lastSaveDate;
 
         [SerializeField] private MetaData            metaData;
-        [SerializeField] private List<SaveableData>  saveData      = new List<SaveableData>();
-        [SerializeField] private List<PrimitiveData> primitiveData = new List<PrimitiveData>();
+        [SerializeField] private List<SaveableData>  saveData;
+        [SerializeField] private List<PrimitiveData> primitiveData;
 
         // Stored in dictionary for quick lookup
         [NonSerialized]
-        private Dictionary<string, int> saveDataCache      = new Dictionary<string, int>(StringComparer.Ordinal);
-        private Dictionary<string, int> primitiveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
+        private Dictionary<string, int> saveDataCache;
+        private Dictionary<string, int> primitiveDataCache;
 
         [NonSerialized] private bool loaded;
+
+        public SaveGame()
+        {
+            saveData      = new List<SaveableData>();
+            primitiveData = new List<PrimitiveData>();
+
+            saveDataCache      = new Dictionary<string, int>(StringComparer.Ordinal);
+            primitiveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
+        }
 
         public void OnWrite()
         {
@@ -117,7 +126,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 {
                     data = PrimitivesParser.ToPrimitiveData(data),
                     guid = id,
-                    type = PrimitiveTypeExtensions.FromType(data.GetType()).ToInt(),
+                    type = PrimitiveTypeExtensions.FromType(data.GetType()),
                 };
             }
             else
@@ -126,7 +135,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 {
                     data = PrimitivesParser.ToPrimitiveData(data),
                     guid = id,
-                    type = PrimitiveTypeExtensions.FromType(data.GetType()).ToInt(),
+                    type = PrimitiveTypeExtensions.FromType(data.GetType()),
                 };
 
                 primitiveData.Add(newPrimitiveData);
@@ -140,7 +149,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 
             if (primitiveDataCache.TryGetValue(id, out saveIndex))
             {
-                return PrimitivesParser.Parse<T>(primitiveData[saveIndex].data, PrimitiveTypeExtensions.FromInt(primitiveData[saveIndex].type));
+                return PrimitivesParser.Parse<T>(primitiveData[saveIndex].data, primitiveData[saveIndex].type);
             }
             else
             {

@@ -4,16 +4,6 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData.Primitives
 {
     public static class PrimitiveTypeExtensions
     {
-        public static int ToInt(this PrimitiveType primitiveType)
-        {
-            return (int)primitiveType;
-        }
-
-        public static PrimitiveType FromInt(int typeInt)
-        {
-            return (PrimitiveType)typeInt;
-        }
-
         public static PrimitiveType FromType(Type type)
         {
             if (type == typeof(bool))
