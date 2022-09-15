@@ -2,6 +2,7 @@ using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
@@ -48,14 +49,14 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 
             metaData.lastSaveDate     = lastSaveDate.ToString();
             metaData.creationDate     = creationDate.ToString();
-            metaData.gameVersion      = gameVersion;
             metaData.timePlayed       = timePlayed.ToString();
             metaData.migrationVersion = migrationVersion;
+
+            AddGameVersionToHistory(Application.version);
         }
 
         public void OnLoad()
         {
-            gameVersion      = metaData.gameVersion;
             migrationVersion = metaData.migrationVersion;
 
             DateTime.TryParse(metaData.lastSaveDate, out lastSaveDate);
@@ -233,6 +234,28 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 + "[" + DateTime.UtcNow.ToString("G", CultureInfo.GetCultureInfo("en-US")) + "] "
                 + "Created initial savegame"
             };
+        }
+
+        private void AddGameVersionToHistory(string gameVersion)
+        {
+            if (metaData.gameVersionHistory == null)
+            {
+                metaData.gameVersionHistory = new string[0];
+            }
+
+            if (metaData.gameVersionHistory.Contains(gameVersion))
+            {
+                return;
+            }
+
+            string[] newGameVersionHistory = new string[metaData.gameVersionHistory.Length + 1];
+            for (int i = 0; i < metaData.gameVersionHistory.Length; i++)
+            {
+                newGameVersionHistory[i] = metaData.gameVersionHistory[i];
+            }
+            newGameVersionHistory[newGameVersionHistory.Length - 1] = gameVersion;
+
+            metaData.gameVersionHistory = newGameVersionHistory;
         }
     }
 }

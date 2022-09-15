@@ -210,7 +210,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             }
         }
 
-        public static void WriteSave(SaveGame saveGame, int saveSlot)
+        public static void WriteSave(SaveGame saveGame, int saveSlot, bool forceNoMultiThread = false)
         {
             string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), fileExtentionName);
 
@@ -234,7 +234,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             saveGame.OnWrite();
 
-            if (SaveSettings.Get().useMultiThreadedWriteback)
+            if (SaveSettings.Get().useMultiThreadedWriteback && forceNoMultiThread == false)
             {
                 if (_writebackSaveGameJob != null && _writebackSaveGameJob.IsDone == false)
                 {

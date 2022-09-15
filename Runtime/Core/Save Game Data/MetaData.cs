@@ -11,7 +11,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
     {
         public ulong    migrationVersion;
         public string[] migrationHistory;
-        public string   gameVersion;
+        public string[] gameVersionHistory;
         public string   creationDate;
         public string   lastSaveDate;
         public string   timePlayed;
