@@ -214,16 +214,10 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 metaData.migrationHistory = new string[0];
             }
 
-            string[] newMigrationHistory = new string[metaData.migrationHistory.Length + 1];
-            for (int i = 0; i < metaData.migrationHistory.Length; i++)
-            {
-                newMigrationHistory[i] = metaData.migrationHistory[i];
-            }
-            newMigrationHistory[newMigrationHistory.Length - 1] = "[" + migration.version.ToString() + "] "
+            metaData.migrationHistory = AddElementToStringArray("[" + migration.version.ToString() + "] "
                 + "[" + DateTime.UtcNow.ToString("G", CultureInfo.GetCultureInfo("en-US")) + "] "
-                + migration.description;
-
-            metaData.migrationHistory = newMigrationHistory;
+                + migration.description,
+                metaData.migrationHistory);
         }
 
         public void AddCreationVersionToMigrationHistory(ulong creationVersion)
@@ -248,14 +242,105 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 return;
             }
 
-            string[] newGameVersionHistory = new string[metaData.gameVersionHistory.Length + 1];
-            for (int i = 0; i < metaData.gameVersionHistory.Length; i++)
-            {
-                newGameVersionHistory[i] = metaData.gameVersionHistory[i];
-            }
-            newGameVersionHistory[newGameVersionHistory.Length - 1] = gameVersion;
-
-            metaData.gameVersionHistory = newGameVersionHistory;
+            metaData.gameVersionHistory = AddElementToStringArray(gameVersion, metaData.gameVersionHistory);
         }
+
+        #region Tags
+
+        private void InitializeTags()
+        {
+            if (metaData.tags != null)
+            {
+                return;
+            }
+
+            metaData.tags = new string[0];
+        }
+
+        public void AddTag(string tag)
+        {
+            InitializeTags();
+
+            if (metaData.tags.Contains(tag))
+            {
+                return;
+            }
+
+            metaData.tags = AddElementToStringArray(tag, metaData.tags);
+        }
+
+        public bool ContainsTag(string tag)
+        {
+            InitializeTags();
+
+            return metaData.tags.Contains(tag);
+        }
+
+        public string[] GetAllTags()
+        {
+            InitializeTags();
+
+            return metaData.tags;
+        }
+
+        /// <summary>
+        /// Returns, whether the specified tag has been deleted.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public bool DeleteTag(string tag)
+        {
+            InitializeTags();
+
+            if (!metaData.tags.Contains(tag))
+            {
+                return false;
+            }
+
+            metaData.tags = RemoveElementFromStringArray(tag, metaData.tags);
+            return true;
+        }
+
+        public void ClearAllTags()
+        {
+            metaData.tags = new string[0];
+        }
+
+        #endregion
+
+        #region Boilerplate
+
+        private static string[] AddElementToStringArray(string element, string[] array)
+        {
+            string[] newArray = new string[array.Length + 1];
+            for (int i = 0; i < array.Length; i++)
+            {
+                newArray[i] = array[i];
+            }
+
+            newArray[newArray.Length - 1] = element;
+            return newArray;
+        }
+
+        private static string[] RemoveElementFromStringArray(string element, string[] array)
+        {
+            if (!array.Contains(element))
+            {
+                return array;
+            }
+
+            List<string> newArrayList = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] != element)
+                {
+                    newArrayList.Add(element);
+                }
+            }
+
+            return newArrayList.ToArray();
+        }
+
+        #endregion
     }
 }
