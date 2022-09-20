@@ -2,6 +2,7 @@ using Produktivkeller.SimpleSaveSystem.Configuration;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Jobs;
 using Produktivkeller.SimpleSaveSystem.Migration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         private static bool debugMode { get { return SaveSettings.Get().showSaveFileUtilityLog; } }
 
         private static WritebackSaveGameJob _writebackSaveGameJob = null;
+
+        public delegate void ErrorLoadingSaveGameEvent(string saveGamePath);
+        public static event ErrorLoadingSaveGameEvent ErrorLoadingSaveGame;
 
         private static string DataPath
         {
@@ -111,7 +115,15 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 return null;
             }
 
-            SaveGame getSave = JsonUtility.FromJson<SaveGame>(data);
+            SaveGame getSave = null;
+            try
+            {
+                getSave = JsonUtility.FromJson<SaveGame>(data);
+            }
+            catch (Exception exception)
+            {
+                Log(string.Format("Exception occured during parsing savegame: {0}", exception.Message));
+            }
 
             if (getSave != null)
             {
@@ -121,6 +133,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             else
             {
                 Log(string.Format("Save file corrupted: {0}", savePath));
+
+                ErrorLoadingSaveGame?.Invoke(savePath);
+
                 return null;
             }
         }

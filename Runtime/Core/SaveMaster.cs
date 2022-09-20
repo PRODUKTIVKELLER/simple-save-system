@@ -35,23 +35,27 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         // All listeners
         private static List<Saveable> saveables = new List<Saveable>();
 
+        public delegate void ErrorLoadingSaveGameEvent(string saveGamePath);
+        public static event ErrorLoadingSaveGameEvent ErrorLoadingSaveGame;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateInstance()
         {
             GameObject saveMasterObject = new GameObject("Save Master");
             saveMasterObject.AddComponent<SaveMaster>();
 
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneLoaded   += OnSceneLoaded;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+            SaveFileUtility.ErrorLoadingSaveGame += SaveFileUtility_ErrorLoadingSaveGame;
 
             GameObject.DontDestroyOnLoad(saveMasterObject);
         }
 
-        /*  
-        *  Instance managers exist to keep track of spawned objects.
-        *  These managers make it possible to drop a coin, and when you reload the game
-        *  the coin will still be there.
-        */
+        private static void SaveFileUtility_ErrorLoadingSaveGame(string saveGamePath)
+        {
+            ErrorLoadingSaveGame?.Invoke(saveGamePath);
+        }
 
         private static void OnSceneUnloaded(Scene scene)
         {

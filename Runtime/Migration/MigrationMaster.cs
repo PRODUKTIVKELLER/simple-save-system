@@ -36,6 +36,11 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
             {
                 SaveGame saveGame = SaveFileUtility.LoadSaveFromPath(savePath.Value);
 
+                if (saveGame == null)
+                {
+                    continue;
+                }
+
                 SaveGame migratedSavegame = PerformMigration(saveGame);
 
                 if (migratedSavegame != null)
