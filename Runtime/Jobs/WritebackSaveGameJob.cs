@@ -27,6 +27,8 @@ namespace Produktivkeller.SimpleSaveSystem.Jobs
             string   savePathToStore = _savePath;
 
             File.WriteAllText(savePathToStore, JsonUtility.ToJson(saveGameToStore, true));
+
+            saveGameToStore.WritebackAllScheduledWritebacks();
         }
     }
 }

@@ -111,6 +111,7 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
         public string fileFolderName = "SaveData";
         public string fileFolderNameEditor = "SaveData Editor";
         public string fileName = "Slot";
+        public string specialDataFolderNameSuffix = "_Data";
         public bool useMultiThreadedWriteback = true;
 
         [Header("Configuration")]

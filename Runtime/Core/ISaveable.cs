@@ -1,4 +1,6 @@
 
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SpecialData;
+
 namespace Produktivkeller.SimpleSaveSystem.Core
 {
     public interface ISaveable
@@ -9,6 +11,11 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// </summary>
         /// <returns> Data for the save file </returns>
         string OnSave();
+
+        SpecialData OnSaveSpecialData()
+        {
+            return null;
+        }
 
         /// <summary>
         /// Called by a Saveable component. SaveMaster (request load) 

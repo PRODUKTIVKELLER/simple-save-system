@@ -1,4 +1,5 @@
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.Primitives;
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SpecialData.ScheduledWritebacks;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,6 +32,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 
         [NonSerialized] private bool loaded;
 
+        [NonSerialized] private Dictionary<string, ScheduledWritebackData> _scheduledWritebackData;
+
         public SaveGame()
         {
             saveData      = new List<SaveableData>();
@@ -38,6 +41,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 
             saveDataCache      = new Dictionary<string, int>(StringComparer.Ordinal);
             primitiveDataCache = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            _scheduledWritebackData = new Dictionary<string, ScheduledWritebackData>();
         }
 
         public void OnWrite()
@@ -82,6 +87,40 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 {
                     primitiveDataCache.Add(primitiveData[i].guid, i);
                 }
+            }
+        }
+
+        public void AddScheduledFileData(string filePath, byte[] data)
+        {
+            if (!_scheduledWritebackData.ContainsKey(filePath))
+            {
+                _scheduledWritebackData.Add(filePath, new ScheduledWritebackBytes()
+                {
+                    Bytes = data
+                });
+            }
+
+            ((ScheduledWritebackBytes)_scheduledWritebackData[filePath]).Bytes = data;
+        }
+
+        public void AddScheduledFileData(string filePath, string data)
+        {
+            if (!_scheduledWritebackData.ContainsKey(filePath))
+            {
+                _scheduledWritebackData.Add(filePath, new ScheduledWritebackString()
+                {
+                    String = data
+                });
+            }
+
+            ((ScheduledWritebackString)_scheduledWritebackData[filePath]).String = data;
+        }
+
+        public void WritebackAllScheduledWritebacks()
+        {
+            foreach (KeyValuePair<string, ScheduledWritebackData> keyValuePair in _scheduledWritebackData)
+            {
+                keyValuePair.Value.WriteToFile(keyValuePair.Key);
             }
         }
 

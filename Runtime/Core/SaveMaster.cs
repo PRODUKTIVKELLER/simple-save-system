@@ -374,7 +374,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             {
                 for (int i = 0; i < saveables.Count; i++)
                 {
-                    saveables[i].OnSaveRequest(activeSaveGame);
+                    saveables[i].OnSaveRequest(activeSaveGame, activeSlot);
                 }
 
                 SaveFileUtility.WriteSave(activeSaveGame, activeSlot);
@@ -436,7 +436,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 int saveableCount = saveables.Count;
                 for (int i = saveableCount - 1; i >= 0; i--)
                 {
-                    saveables[i].OnSaveRequest(activeSaveGame);
+                    saveables[i].OnSaveRequest(activeSaveGame, activeSlot);
                 }
             }
 
@@ -500,7 +500,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             {
                 if (saveable != null && activeSaveGame != null)
                 {
-                    saveable.OnSaveRequest(activeSaveGame);
+                    saveable.OnSaveRequest(activeSaveGame, activeSlot);
                 }
             }
         }
@@ -561,7 +561,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             for (int i = 0; i < count; i++)
             {
-                saveables[i].OnSaveRequest(activeSaveGame);
+                saveables[i].OnSaveRequest(activeSaveGame, activeSlot);
             }
         }
 

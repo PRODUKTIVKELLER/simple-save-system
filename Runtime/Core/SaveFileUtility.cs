@@ -28,6 +28,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         private static string fileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
         private static string gameFileName { get { return SaveSettings.Get().fileName; } }
+        private static string specialDataFolderNameSuffix { get { return SaveSettings.Get().specialDataFolderNameSuffix; } }
 
         private static bool debugMode { get { return SaveSettings.Get().showSaveFileUtilityLog; } }
 
@@ -220,9 +221,19 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             }
         }
 
+        public static string GetSaveGameSpecificDataFolder(int saveSlot)
+        {
+            return string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), specialDataFolderNameSuffix);
+        }
+
         public static void WriteSave(SaveGame saveGame, int saveSlot, bool forceNoMultiThread = false)
         {
             string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), fileExtentionName);
+            string specialDataSavePath = GetSaveGameSpecificDataFolder(saveSlot);
+            if (!Directory.Exists(specialDataSavePath))
+            {
+                Directory.CreateDirectory(specialDataSavePath);
+            }
 
             if (SaveSettings.Get().writebackToFileDisabled)
             {
@@ -262,6 +273,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             else
             {
                 File.WriteAllText(savePath, JsonUtility.ToJson(saveGame, true));
+
+                saveGame.WritebackAllScheduledWritebacks();
             }
 
 

@@ -1,4 +1,6 @@
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
+using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SpecialData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -251,7 +253,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         }
 
         // Request is sent by the Save System
-        public void OnSaveRequest(SaveGame saveGame)
+        public void OnSaveRequest(SaveGame saveGame, int saveSlot)
         {
             if (!hasIdentification)
             {
@@ -278,11 +280,19 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                         continue;
                     }
 
-                    string dataString = getSaveable.OnSave();
+                    string      dataString  = getSaveable.OnSave();
+                    SpecialData specialData = getSaveable.OnSaveSpecialData();
 
-                    if (!string.IsNullOrEmpty(dataString))
+                    if (!string.IsNullOrEmpty(dataString) || specialData != null)
                     {
-                        saveGame.Set(getIdentification, dataString);
+                        if (specialData != null)
+                        {
+                            specialData.WriteData(getIdentification, saveGame, SaveFileUtility.GetSaveGameSpecificDataFolder(saveSlot));
+                        }
+                        else
+                        {
+                            saveGame.Set(getIdentification, dataString);
+                        }
                     }
                 }
             }
