@@ -102,12 +102,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static SaveGame LoadSaveFromPath(string savePath)
         {
-            string data = "";
-
-            using (var reader = new BinaryReader(File.Open(savePath, FileMode.Open)))
-            {
-                data = reader.ReadString();
-            }
+            string data = File.ReadAllText(savePath);
 
             if (string.IsNullOrEmpty(data))
             {
@@ -251,10 +246,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             }
             else
             {
-                using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
-                {
-                    writer.Write(JsonUtility.ToJson(saveGame, true));
-                }
+                File.WriteAllText(savePath, JsonUtility.ToJson(saveGame, true));
             }
 
 
