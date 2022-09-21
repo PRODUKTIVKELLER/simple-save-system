@@ -37,7 +37,7 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             return JsonUtility.ToJson(new SaveData() { rotation = this.transform.rotation.eulerAngles });
         }
 
-        public bool OnShouldBeSaved()
+        public bool ShouldBeSaved()
         {
             activeRotation = this.transform.rotation.eulerAngles;
             return lastRotation != activeRotation;

@@ -44,7 +44,7 @@ namespace Produktivkeller.SimpleSaveSystem.SaveableComponents
             return isEnabled ? "1" : "0";
         }
 
-        public bool OnShouldBeSaved()
+        public bool ShouldBeSaved()
         {
             return true;
         }

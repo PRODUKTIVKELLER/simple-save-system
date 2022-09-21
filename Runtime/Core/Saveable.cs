@@ -275,7 +275,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 }
                 else
                 {
-                    if (!hasStateReset && !getSaveable.OnShouldBeSaved())
+                    if (!hasStateReset && !getSaveable.ShouldBeSaved())
                     {
                         continue;
                     }

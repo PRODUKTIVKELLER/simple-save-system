@@ -11,6 +11,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SerializationHelper
         [SerializeField] private string                       className;
         [SerializeField] private string                       tag;
         [SerializeField] private string                       jsonData;
+        [SerializeField] private string                       identifier;
         [SerializeField] private List<SerializationContainer> childContainers;
 
         public SerializationContainer()
@@ -25,11 +26,11 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SerializationHelper
             return serializationContainer;
         }
 
-        public void SetData(SerializedObject data, string tag = "")
+        public void SetData(string identifier, SerializedObject data)
         {
-            className = data.GetType().Name;
-            jsonData  = data.Serialize();
-            this.tag  = tag;
+            className       = data.GetType().Name;
+            jsonData        = data.Serialize();
+            this.identifier = identifier;
         }
 
         /// <summary>
@@ -37,10 +38,10 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SerializationHelper
         /// </summary>
         /// <param name="data"></param>
         /// <param name="tag"></param>
-        public void AddData(SerializedObject data, string tag = "")
+        public void AddData(string identifier, SerializedObject data)
         {
             SerializationContainer serializationContainer = AddContainer();
-            serializationContainer.SetData(data, tag);
+            serializationContainer.SetData(data, identifier);
         }
 
         public int Count
@@ -50,6 +51,22 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SerializationHelper
         {
             get { return childContainers[i]; }
             set { childContainers[i] = value; }
+        }
+
+        public SerializationContainer this[string identifier]
+        {
+            get
+            {
+                for (int i = 0; i < childContainers.Count; i++)
+                {
+                    if (childContainers[i].identifier == identifier)
+                    {
+                        return childContainers[i];
+                    }
+                }
+
+                return null;
+            }
         }
 
         public SerializedObject Data
