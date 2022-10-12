@@ -1,8 +1,8 @@
 ﻿using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core.IOInterface;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +12,15 @@ namespace Produktivkeller.SimpleSaveSystem.Jobs
 {
     public class WritebackSaveGameJob : ThreadedJob
     {
-        private string   _savePath;
-        private SaveGame _saveGame;
+        private string          _savePath;
+        private SaveGame        _saveGame;
+        private IFileReadWriter _fileReadWriter;
 
-        public WritebackSaveGameJob(string savePath, SaveGame saveGame)
+        public WritebackSaveGameJob(string savePath, SaveGame saveGame, IFileReadWriter fileReadWriter)
         {
-            _savePath = savePath;
-            _saveGame = saveGame;
+            _savePath       = savePath;
+            _saveGame       = saveGame;
+            _fileReadWriter = fileReadWriter;
         }
 
         protected override void ThreadFunction()
@@ -26,7 +28,7 @@ namespace Produktivkeller.SimpleSaveSystem.Jobs
             SaveGame saveGameToStore = _saveGame;
             string   savePathToStore = _savePath;
 
-            File.WriteAllText(savePathToStore, JsonUtility.ToJson(saveGameToStore, true));
+            _fileReadWriter.WriteText(savePathToStore, JsonUtility.ToJson(saveGameToStore, true));
 
             saveGameToStore.WritebackAllScheduledWritebacks();
         }

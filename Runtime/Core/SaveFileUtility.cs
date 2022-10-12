@@ -1,10 +1,10 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core.IOInterface;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Jobs;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 #if UNITY_WEBGL
@@ -26,18 +26,34 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         private static Dictionary<string, SaveGame> _writebackDisabledSavegamesCache = new Dictionary<string, SaveGame>();
 
-        private static string fileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
+        public static string FileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
         private static string gameFileName { get { return SaveSettings.Get().fileName; } }
         private static string specialDataFolderNameSuffix { get { return SaveSettings.Get().specialDataFolderNameSuffix; } }
 
         private static bool debugMode { get { return SaveSettings.Get().showSaveFileUtilityLog; } }
 
         private static WritebackSaveGameJob _writebackSaveGameJob = null;
+        private static IFileReadWriter _fileReadWriter;
 
         public delegate void ErrorLoadingSaveGameEvent(string saveGamePath);
         public static event ErrorLoadingSaveGameEvent ErrorLoadingSaveGame;
 
-        private static string DataPath
+        public static void SetFileReadWriter(IFileReadWriter fileReadWriter)
+        {
+            _fileReadWriter = fileReadWriter;
+        }
+
+        private static void InitializeFileReadWriterIfNecessary()
+        {
+            if (_fileReadWriter != null)
+            {
+                return;
+            }
+
+            _fileReadWriter = new DefaultFileReadWriter();
+        }
+
+        public static string DataPath
         {
             get
             {
@@ -62,6 +78,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static Dictionary<int, string> ObtainSavePaths()
         {
+            InitializeFileReadWriterIfNecessary();
+
             if (cachedSavePaths != null && _isCachedSavePathsDirty == false)
             {
                 return cachedSavePaths;
@@ -69,15 +87,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             Dictionary<int, string> newSavePaths = new Dictionary<int, string>();
 
-            // Create a directory if it doesn't exist yet
-            if (!Directory.Exists(DataPath))
-            {
-                Directory.CreateDirectory(DataPath);
-            }
+            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPath);
 
-            string[] filePaths = Directory.GetFiles(DataPath);
-
-            string[] savePaths = filePaths.Where(path => path.EndsWith(fileExtentionName)).ToArray();
+            string[] savePaths = _fileReadWriter.ObtainAllSavegameFiles();
 
             int pathCount = savePaths.Length;
 
@@ -107,12 +119,14 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static SaveGame LoadSaveFromPath(string savePath)
         {
-            string data = File.ReadAllText(savePath);
+            InitializeFileReadWriterIfNecessary();
+
+            string data = _fileReadWriter.ReadText(savePath);
 
             if (string.IsNullOrEmpty(data))
             {
                 Log(string.Format("Save file empty: {0}. It will be automatically removed", savePath));
-                File.Delete(savePath);
+                _fileReadWriter.DeleteFile(savePath);
                 return null;
             }
 
@@ -228,12 +242,12 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static void WriteSave(SaveGame saveGame, int saveSlot, bool forceNoMultiThread = false)
         {
-            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), fileExtentionName);
+            InitializeFileReadWriterIfNecessary();
+
+            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), FileExtentionName);
             string specialDataSavePath = GetSaveGameSpecificDataFolder(saveSlot);
-            if (!Directory.Exists(specialDataSavePath))
-            {
-                Directory.CreateDirectory(specialDataSavePath);
-            }
+
+            _fileReadWriter.CreateDirectory(specialDataSavePath);
 
             if (SaveSettings.Get().writebackToFileDisabled)
             {
@@ -265,14 +279,14 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                 {
                     Debug.Log("Started writeback job.");
 
-                    _writebackSaveGameJob = new WritebackSaveGameJob(savePath, saveGame);
+                    _writebackSaveGameJob = new WritebackSaveGameJob(savePath, saveGame, _fileReadWriter);
 
                     _writebackSaveGameJob.Start();
                 }
             }
             else
             {
-                File.WriteAllText(savePath, JsonUtility.ToJson(saveGame, true));
+                _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, true));
 
                 saveGame.WritebackAllScheduledWritebacks();
             }
@@ -285,12 +299,13 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static void DeleteSave(int slot)
         {
-            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, fileExtentionName);
+            InitializeFileReadWriterIfNecessary();
 
-            if (File.Exists(filePath))
+            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, FileExtentionName);
+
+            if (_fileReadWriter.DeleteFile(filePath))
             {
                 Log(string.Format("Succesfully removed file at {0}", filePath));
-                File.Delete(filePath);
 
                 if (cachedSavePaths.ContainsKey(slot))
                 {

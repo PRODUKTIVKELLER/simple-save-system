@@ -1,4 +1,3 @@
-
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData.SpecialData;
 
 namespace Produktivkeller.SimpleSaveSystem.Core
