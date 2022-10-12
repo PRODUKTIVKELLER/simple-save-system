@@ -44,15 +44,13 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
             _fileReadWriter = new DefaultFileReadWriter();
         }
 
-        public static string DataPath
+        public static string DataPathLocal
         {
             get
             {
-                return string.Format("{0}/{1}",
-                    Application.persistentDataPath,
-                    Application.isEditor
+                return Application.isEditor
                         ? SaveSettings.Get().fileFolderNameEditor
-                        : SaveSettings.Get().fileFolderName);
+                        : SaveSettings.Get().fileFolderName;
             }
         }
 
@@ -78,7 +76,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
             Dictionary<int, string> newSavePaths = new Dictionary<int, string>();
 
-            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPath);
+            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPathLocal);
 
             string[] savePaths = _fileReadWriter.ObtainAllSavegameFiles();
 
@@ -90,7 +88,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
                 int getSlotNumber;
 
-                string fileName = savePaths[i].Substring(DataPath.Length + gameFileName.Length + 1);
+                string fileName = savePaths[i].Substring(DataPathLocal.Length + gameFileName.Length + 1);
 
                 if (int.TryParse(fileName.Substring(0, fileName.LastIndexOf(".")), out getSlotNumber))
                 {
@@ -218,7 +216,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
         {
             InitializeFileReadWriterIfNecessary();
 
-            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), FileExtentionName);
+            string savePath = string.Format("{0}/{1}{2}{3}", DataPathLocal, gameFileName, saveSlot.ToString(), FileExtentionName);
 
             if (SaveSettings.Get().writebackToFileDisabled)
             {
@@ -249,7 +247,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static void DeleteSave(int slot)
         {
-            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, FileExtentionName);
+            string filePath = string.Format("{0}/{1}{2}{3}", DataPathLocal, gameFileName, slot, FileExtentionName);
 
             if (_fileReadWriter.DeleteFile(filePath))
             {
