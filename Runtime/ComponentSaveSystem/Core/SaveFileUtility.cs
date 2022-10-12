@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
+using Produktivkeller.SimpleSaveSystem.Core.IOInterface;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using UnityEngine;
 #if UNITY_WEBGL
@@ -23,12 +23,28 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         private static Dictionary<string, SaveGame> _writebackDisabledSavegamesCache = new Dictionary<string, SaveGame>();
 
-        private static string fileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
+        public static string FileExtentionName { get { return SaveSettings.Get().fileExtensionName; } }
         private static string gameFileName { get { return SaveSettings.Get().fileName; } }
 
         private static bool debugMode { get { return SaveSettings.Get().showSaveFileUtilityLog; } }
+        private static IFileReadWriter _fileReadWriter;
 
-        private static string DataPath
+        public static void SetFileReadWriter(IFileReadWriter fileReadWriter)
+        {
+            _fileReadWriter = fileReadWriter;
+        }
+
+        private static void InitializeFileReadWriterIfNecessary()
+        {
+            if (_fileReadWriter != null)
+            {
+                return;
+            }
+
+            _fileReadWriter = new DefaultFileReadWriter();
+        }
+
+        public static string DataPath
         {
             get
             {
@@ -53,6 +69,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static Dictionary<int, string> ObtainSavePaths()
         {
+            InitializeFileReadWriterIfNecessary();
+
             if (cachedSavePaths != null && _isCachedSavePathsDirty == false)
             {
                 return cachedSavePaths;
@@ -60,15 +78,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
             Dictionary<int, string> newSavePaths = new Dictionary<int, string>();
 
-            // Create a directory if it doesn't exist yet
-            if (!Directory.Exists(DataPath))
-            {
-                Directory.CreateDirectory(DataPath);
-            }
+            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPath);
 
-            string[] filePaths = Directory.GetFiles(DataPath);
-
-            string[] savePaths = filePaths.Where(path => path.EndsWith(fileExtentionName)).ToArray();
+            string[] savePaths = _fileReadWriter.ObtainAllSavegameFiles();
 
             int pathCount = savePaths.Length;
 
@@ -98,17 +110,14 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static SaveGame LoadSaveFromPath(string savePath)
         {
-            string data = "";
+            InitializeFileReadWriterIfNecessary();
 
-            using (var reader = new BinaryReader(File.Open(savePath, FileMode.Open)))
-            {
-                data = reader.ReadString();
-            }
+            string data = _fileReadWriter.ReadText(savePath);
 
             if (string.IsNullOrEmpty(data))
             {
                 Log(string.Format("Save file empty: {0}. It will be automatically removed", savePath));
-                File.Delete(savePath);
+                _fileReadWriter.DeleteFile(savePath);
                 return null;
             }
 
@@ -207,7 +216,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static void WriteSave(SaveGame saveGame, int saveSlot)
         {
-            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), fileExtentionName);
+            InitializeFileReadWriterIfNecessary();
+
+            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), FileExtentionName);
 
             if (SaveSettings.Get().writebackToFileDisabled)
             {
@@ -229,12 +240,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
             saveGame.OnWrite();
 
-            using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
-            {
-                var jsonString = JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint);
-
-                writer.Write(jsonString);
-            }
+            _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint));
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         SyncFiles();
@@ -243,12 +249,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
         public static void DeleteSave(int slot)
         {
-            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, fileExtentionName);
+            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, FileExtentionName);
 
-            if (File.Exists(filePath))
+            if (_fileReadWriter.DeleteFile(filePath))
             {
                 Log(string.Format("Succesfully removed file at {0}", filePath));
-                File.Delete(filePath);
 
                 if (cachedSavePaths.ContainsKey(slot))
                 {
