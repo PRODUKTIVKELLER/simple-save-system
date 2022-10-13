@@ -53,15 +53,13 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             _fileReadWriter = new DefaultFileReadWriter();
         }
 
-        public static string DataPath
+        public static string DataPathLocal
         {
             get
             {
-                return string.Format("{0}/{1}",
-                    Application.persistentDataPath,
-                    Application.isEditor
+                return Application.isEditor
                         ? SaveSettings.Get().fileFolderNameEditor
-                        : SaveSettings.Get().fileFolderName);
+                        : SaveSettings.Get().fileFolderName;
             }
         }
 
@@ -87,7 +85,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             Dictionary<int, string> newSavePaths = new Dictionary<int, string>();
 
-            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPath);
+            _fileReadWriter.CreateDirectory(SaveFileUtility.DataPathLocal);
 
             string[] savePaths = _fileReadWriter.ObtainAllSavegameFiles();
 
@@ -99,7 +97,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
                 int getSlotNumber;
 
-                string fileName = savePaths[i].Substring(DataPath.Length + gameFileName.Length + 1);
+                string fileName = savePaths[i].Substring(DataPathLocal.Length + gameFileName.Length + 1);
 
                 if (int.TryParse(fileName.Substring(0, fileName.LastIndexOf(".")), out getSlotNumber))
                 {
@@ -237,14 +235,14 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         public static string GetSaveGameSpecificDataFolder(int saveSlot)
         {
-            return string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), specialDataFolderNameSuffix);
+            return string.Format("{0}/{1}{2}{3}", DataPathLocal, gameFileName, saveSlot.ToString(), specialDataFolderNameSuffix);
         }
 
         public static void WriteSave(SaveGame saveGame, int saveSlot, bool forceNoMultiThread = false)
         {
             InitializeFileReadWriterIfNecessary();
 
-            string savePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, saveSlot.ToString(), FileExtentionName);
+            string savePath = string.Format("{0}/{1}{2}{3}", DataPathLocal, gameFileName, saveSlot.ToString(), FileExtentionName);
             string specialDataSavePath = GetSaveGameSpecificDataFolder(saveSlot);
 
             _fileReadWriter.CreateDirectory(specialDataSavePath);
@@ -301,7 +299,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         {
             InitializeFileReadWriterIfNecessary();
 
-            string filePath = string.Format("{0}/{1}{2}{3}", DataPath, gameFileName, slot, FileExtentionName);
+            string filePath = string.Format("{0}/{1}{2}{3}", DataPathLocal, gameFileName, slot, FileExtentionName);
 
             if (_fileReadWriter.DeleteFile(filePath))
             {
