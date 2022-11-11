@@ -200,6 +200,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
                     Log(string.Format("Creating save at slot {0}", slot));
 
                     SaveGame saveGame = new SaveGame();
+
+                    if (ShippedSaveGame.ExistsShippedSaveGameForSlot(slot))
+                    {
+                        saveGame = JsonUtility.FromJson<SaveGame>(ShippedSaveGame.GetShippedSaveGameForSlot(slot).saveGameJson);
+                    }
+
                     saveGame.version = MigrationMaster.GetMostRecentMigrationVersion();
                     saveGame.AddCreationVersionToMigrationHistory(saveGame.version);
 
