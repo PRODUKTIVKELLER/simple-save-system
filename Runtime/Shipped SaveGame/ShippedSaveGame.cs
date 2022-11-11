@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Produktivkeller.SimpleSaveSystem
 {
     [CreateAssetMenu(fileName = "Shipped SaveGame", menuName = "PRODUKTIVKELLER/Simple Save System/Shipped SaveGame")]
-    public class ShippedSaveGame : MonoBehaviour
+    public class ShippedSaveGame : ScriptableObject
     {
         public int saveSlot;
         public string saveGameJson;
