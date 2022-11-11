@@ -47,14 +47,27 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
 
         public string ReadText(string path)
         {
-            return File.ReadAllText(AddApplicationPersistentDataPathToString(path));
+            string fullPath = AddApplicationPersistentDataPathToString(path);
+            string data = "";
+
+            using (var reader = new BinaryReader(File.Open(fullPath, FileMode.Open)))
+            {
+                data = reader.ReadString();
+            }
+
+            return data;
         }
 
         public void WriteText(string path, string text)
         {
             string fullPath = AddApplicationPersistentDataPathToString(path);
 
-            File.WriteAllText(fullPath, text);
+            using (var writer = new BinaryWriter(File.Open(fullPath, FileMode.Create)))
+            {
+                var jsonString = text;
+
+                writer.Write(jsonString);
+            }
         }
 
         private string RemoveApplicationPersistentDataPathFromString(string text)
