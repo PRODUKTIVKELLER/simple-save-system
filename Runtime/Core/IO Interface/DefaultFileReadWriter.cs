@@ -52,10 +52,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
         {
             string fullPath = AddApplicationPersistentDataPathToString(path);
 
-            if (!Directory.Exists(fullPath))
-            {
-                Directory.CreateDirectory(fullPath);
-            }
+            File.WriteAllText(fullPath, text);
         }
 
         private string RemoveApplicationPersistentDataPathFromString(string text)
