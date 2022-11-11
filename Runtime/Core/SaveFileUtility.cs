@@ -224,6 +224,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
                     if (ShippedSaveGame.ExistsShippedSaveGameForSlot(slot))
                     {
                         saveGame = JsonUtility.FromJson<SaveGame>(ShippedSaveGame.GetShippedSaveGameForSlot(slot).saveGameJson);
+                        saveGame.OnLoad();
                     }
 
                     saveGame.migrationVersion = MigrationMaster.GetMostRecentMigrationVersion();
