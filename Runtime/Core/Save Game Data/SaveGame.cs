@@ -71,7 +71,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
             DateTime.TryParse(metaData.creationDate, out creationDate);
             TimeSpan.TryParse(metaData.timePlayed, out timePlayed);
 
-            if (saveData.Count > 0)
+            if (saveData.Count > 0 || primitiveData.Count > 0)
             {
                 // Clear all empty data on load.
                 int dataCount = saveData.Count;
