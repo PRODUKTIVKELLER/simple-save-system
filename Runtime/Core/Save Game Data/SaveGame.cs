@@ -52,6 +52,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 creationDate = DateTime.Now;
             }
 
+            lastSaveDate = DateTime.Now;
+
             metaData.lastSaveDate     = lastSaveDate.ToString();
             metaData.creationDate     = creationDate.ToString();
             metaData.timePlayed       = timePlayed.ToString();
@@ -76,6 +78,13 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
                 {
                     if (string.IsNullOrEmpty(saveData[i].data))
                         saveData.RemoveAt(i);
+                }
+
+                int dataCountPrimitives = saveData.Count;
+                for (int i = dataCountPrimitives - 1; i >= 0; i--)
+                {
+                    if (string.IsNullOrEmpty(primitiveData[i].data))
+                        primitiveData.RemoveAt(i);
                 }
 
                 for (int i = 0; i < saveData.Count; i++)
