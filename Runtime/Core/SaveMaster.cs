@@ -1,4 +1,5 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
+using Produktivkeller.SimpleSaveSystem.Core.IOInterface;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
@@ -41,6 +42,10 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateInstance()
         {
+#if !UNITY_SWITCH
+            DefaultFileReadWriter.applicationPersistentDataPath = Application.persistentDataPath;
+#endif
+
             GameObject saveMasterObject = new GameObject("Save Master");
             saveMasterObject.AddComponent<SaveMaster>();
 

@@ -6,6 +6,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
 {
     public class DefaultFileReadWriter : IFileReadWriter
     {
+        public static string applicationPersistentDataPath;
+
         public void CreateDirectory(string path)
         {
             string fullPath = AddApplicationPersistentDataPathToString(path);
@@ -58,7 +60,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
         private string RemoveApplicationPersistentDataPathFromString(string text)
         {
             string textWithoutPersDataPath = text.Replace("\\", "/").
-                    Replace(Application.persistentDataPath.Replace("\\", "/"), "");
+                    Replace(applicationPersistentDataPath.Replace("\\", "/"), "");
 
             if (textWithoutPersDataPath.StartsWith("/"))
             {
@@ -71,7 +73,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
         private string AddApplicationPersistentDataPathToString(string text)
         {
             return string.Format("{0}/{1}",
-                    Application.persistentDataPath, text);
+                    applicationPersistentDataPath, text);
         }
     }
 }
