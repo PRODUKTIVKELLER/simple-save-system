@@ -28,6 +28,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
         // Stored in dictionary for quick lookup
         [NonSerialized]
         private Dictionary<string, int> saveDataCache;
+        [NonSerialized]
         private Dictionary<string, int> primitiveDataCache;
 
         [NonSerialized] private bool loaded;
