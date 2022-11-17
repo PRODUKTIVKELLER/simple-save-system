@@ -35,6 +35,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private static SaveGame activeSaveGame = null;
         private static int activeSlot = -1;
 
+        private static bool _performedMigrations = false;
+
         private Coroutine _coroutineTrackedPlaytime;
 
         // All listeners
@@ -179,16 +181,22 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <returns></returns>
         public static bool HasUnusedSlots()
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.GetAvailableSaveSlot() != -1;
         }
 
         public static int[] GetUsedSlots()
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.GetUsedSlots();
         }
 
         public static bool IsSlotUsed(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.IsSlotUsed(slot);
         }
 
@@ -220,6 +228,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <returns></returns>
         public static bool SetSlotToNewSlot(bool notifyListeners, out int slot)
         {
+            PerformMigrationsIfNecessary();
+
             int availableSlot = SaveFileUtility.GetAvailableSaveSlot();
 
             if (availableSlot == -1)
@@ -257,6 +267,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <param name="saveGame"> Set this if you want to overwrite a specific save file </param>
         public static void SetSlotAndCopyActiveSave(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             OnSlotChangeBegin.Invoke(slot);
 
             activeSlot = slot;
@@ -275,6 +287,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <param name="reloadSaveables"> Send a message to all saveables to load the new save file </param>
         public static void SetSlot(int slot, bool reloadSaveables, SaveGame saveGame = null)
         {
+            PerformMigrationsIfNecessary();
+
             if (activeSlot == slot && saveGame == null)
             {
                 Debug.LogWarning("Already loaded this slot.");
@@ -407,6 +421,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
         private static SaveGame GetSave(int slot, bool createIfEmpty = true)
         {
+            PerformMigrationsIfNecessary();
+
             if (slot == activeSlot)
             {
                 return activeSaveGame;
@@ -421,6 +437,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// </summary>
         public static void WriteActiveSaveToDisk()
         {
+            PerformMigrationsIfNecessary();
+
             if (!AreSaveableIDsUnique())
             {
                 Debug.LogError("Saving aborted due to duplicate saveable IDs");
@@ -617,6 +635,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <param name="slot"></param>
         public static void DeleteSave(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             SaveFileUtility.DeleteSave(slot);
 
             if (slot == activeSlot)
@@ -1022,8 +1042,6 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             {
                 instance.StartCoroutine(instance.AutoSaveGame());
             }
-
-            MigrationMaster.ProcessAllSavegames();
         }
 
         private static void InitializeIfNeccessary()
@@ -1035,6 +1053,17 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         private void Awake()
         {
             InitializeIfNeccessary(this);
+        }
+
+        private static void PerformMigrationsIfNecessary()
+        {
+            if (_performedMigrations)
+            {
+                return;
+            }
+
+            MigrationMaster.ProcessAllSavegames();
+            _performedMigrations = true;
         }
 
         private void OnDestroy()
