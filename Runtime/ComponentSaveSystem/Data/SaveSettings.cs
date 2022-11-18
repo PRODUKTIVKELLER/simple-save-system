@@ -7,25 +7,18 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
 {
     public class SaveSettings : ScriptableObject
     {
-        private static SaveSettings instance;
-
         private void OnDestroy()
         {
-            instance = null;
+            PlatformSpecificSaveSettingsProvider.ClearStaticVariables();
         }
 
         public static SaveSettings Get()
         {
-            if (instance != null)
-            {
-                return instance;
-            }
-
-            var savePluginSettings = Resources.Load("Save Plugin Settings", typeof(SaveSettings)) as SaveSettings;
+            SaveSettings saveSettings = PlatformSpecificSaveSettingsProvider.GetSaveSettingOfCurrentPlatform();
 
 #if UNITY_EDITOR
             // In case the settings are not found, we create one
-            if (savePluginSettings == null)
+            if (saveSettings == null)
             {
                 return CreateFile();
             }
@@ -33,15 +26,13 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
 
             // In case it still doesn't exist, somehow it got removed.
             // We send a default instance of SavePluginSettings.
-            if (savePluginSettings == null)
+            if (saveSettings == null)
             {
                 Debug.LogWarning("Could not find SavePluginsSettings in resource folder, did you remove it? Using default settings.");
-                savePluginSettings = ScriptableObject.CreateInstance<SaveSettings>();
+                saveSettings = ScriptableObject.CreateInstance<SaveSettings>();
             }
 
-            instance = savePluginSettings;
-
-            return instance;
+            return saveSettings;
         }
 
 #if UNITY_EDITOR
@@ -61,7 +52,8 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
             // If not, we create a new one.
             if (!File.Exists(filePath))
             {
-                instance = ScriptableObject.CreateInstance<SaveSettings>();
+                SaveSettings instance = ScriptableObject.CreateInstance<SaveSettings>();
+                instance.isForAllPlatforms = true;
                 UnityEditor.AssetDatabase.CreateAsset(instance, "Assets/Resources/Save Plugin Settings.asset");
                 UnityEditor.AssetDatabase.SaveAssets();
                 UnityEditor.AssetDatabase.Refresh();
@@ -102,6 +94,9 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data
         }
 
 #endif
+        [Header("Platform")]
+        public bool isForAllPlatforms;
+        public RuntimePlatform runtimePlatform;
 
         [Header("Versioning")]
         public bool writebackToFileDisabled;
