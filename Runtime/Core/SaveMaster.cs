@@ -21,6 +21,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
         private static GameObject saveMasterTemplate;
 
+        private static bool _performedMigrations = false;
+
         // Used to track duplicate scenes.
         private static Dictionary<string, int> loadedSceneNames = new Dictionary<string, int>();
         private static HashSet<int> duplicatedSceneHandles = new HashSet<int>();
@@ -130,16 +132,22 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns></returns>
         public static bool HasUnusedSlots()
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.GetAvailableSaveSlot() != -1;
         }
 
         public static int[] GetUsedSlots()
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.GetUsedSlots();
         }
 
         public static bool IsSlotUsed(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             return SaveFileUtility.IsSlotUsed(slot);
         }
 
@@ -171,6 +179,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <returns></returns>
         public static bool SetSlotToNewSlot(bool notifyListeners, out int slot)
         {
+            PerformMigrationsIfNecessary();
+
             int availableSlot = SaveFileUtility.GetAvailableSaveSlot();
 
             if (availableSlot == -1)
@@ -208,6 +218,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="saveGame"> Set this if you want to overwrite a specific save file </param>
         public static void SetSlotAndCopyActiveSave(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             OnSlotChangeBegin.Invoke(slot);
 
             activeSlot = slot;
@@ -226,6 +238,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="reloadSaveables"> Send a message to all saveables to load the new save file </param>
         public static void SetSlot(int slot, bool reloadSaveables, SaveGame saveGame = null)
         {
+            PerformMigrationsIfNecessary();
+
             if (activeSlot == slot && saveGame == null)
             {
                 Debug.LogWarning("Already loaded this slot.");
@@ -367,6 +381,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// </summary>
         public static void WriteActiveSaveToDisk()
         {
+            PerformMigrationsIfNecessary();
+
             if (!AreSaveableIDsUnique())
             {
                 Debug.LogError("Saving aborted due to duplicate saveable IDs");
@@ -533,6 +549,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core
         /// <param name="slot"></param>
         public static void DeleteSave(int slot)
         {
+            PerformMigrationsIfNecessary();
+
             SaveFileUtility.DeleteSave(slot);
 
             if (slot == activeSlot)
@@ -882,14 +900,22 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             {
                 instance.StartCoroutine(instance.AutoSaveGame());
             }
-
-            MigrationMaster.ProcessAllSavegames();
         }
 
         private static void InitializeIfNeccessary()
         {
             SaveMaster saveMaster = FindObjectOfType<SaveMaster>();
             InitializeIfNeccessary(saveMaster);
+        }
+        private static void PerformMigrationsIfNecessary()
+        {
+            if (_performedMigrations)
+            {
+                return;
+            }
+
+            MigrationMaster.ProcessAllSavegames();
+            _performedMigrations = true;
         }
 
         private void Awake()
