@@ -965,7 +965,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             while (true)
             {
-                yield return wait;
+                yield return new WaitForSecondsRealtime(SaveSettings.Get().saveIntervalTime);
                 WriteActiveSaveToDisk();
             }
         }
