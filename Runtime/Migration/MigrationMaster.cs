@@ -39,7 +39,7 @@ namespace Produktivkeller.SimpleSaveSystem.Migration
 
                 if (migratedSavegame != null)
                 {
-                    SaveFileUtility.WriteSave(migratedSavegame, savePath.Key);
+                    SaveFileUtility.WriteSave(migratedSavegame, savePath.Key, true);
                 }
                 else
                 {

@@ -2,7 +2,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
 {
     public interface IFileReadWriter
     {
-        public void WriteText(string path, string text);
+        public void WriteText(string path, string text, bool forceInstantWriteback);
 
         public string ReadText(string path);
 

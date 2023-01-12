@@ -210,7 +210,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
                     saveGame.version = MigrationMaster.GetMostRecentMigrationVersion();
                     saveGame.AddCreationVersionToMigrationHistory(saveGame.version);
 
-                    WriteSave(saveGame, slot);
+                    WriteSave(saveGame, slot, true);
 
                     return saveGame;
                 }
@@ -220,6 +220,11 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
         }
 
         public static void WriteSave(SaveGame saveGame, int saveSlot)
+        {
+            WriteSave(saveGame, saveSlot, false);
+        }
+
+        public static void WriteSave(SaveGame saveGame, int saveSlot, bool forceInstantWriteback)
         {
             InitializeFileReadWriterIfNecessary();
 
@@ -245,7 +250,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core
 
             saveGame.OnWrite();
 
-            _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint));
+            _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, SaveSettings.Get().useJsonPrettyPrint), forceInstantWriteback);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         SyncFiles();

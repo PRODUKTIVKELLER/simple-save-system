@@ -298,7 +298,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             // Ensure the current game is saved, and write it to disk, if that is wanted behaviour.
             if (SaveSettings.Get().autoSaveOnSlotSwitch && activeSaveGame != null)
             {
-                WriteActiveSaveToDisk();
+                WriteActiveSaveToDisk(true);
             }
 
             if (SaveSettings.Get().cleanSavedPrefabsOnSlotSwitch)
@@ -431,11 +431,16 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
             return SaveFileUtility.LoadSave(slot, createIfEmpty);
         }
 
+        public static void WriteActiveSaveToDisk()
+        {
+            WriteActiveSaveToDisk(false);
+        }
+
         /// <summary>
         /// Automatically done on application quit or pause.
         /// Exposed in case you still want to manually write the active save.
         /// </summary>
-        public static void WriteActiveSaveToDisk()
+        public static void WriteActiveSaveToDisk(bool forceInstantWriteback)
         {
             PerformMigrationsIfNecessary();
 
@@ -454,7 +459,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                     saveables[i].OnSaveRequest(activeSaveGame);
                 }
 
-                SaveFileUtility.WriteSave(activeSaveGame, activeSlot);
+                SaveFileUtility.WriteSave(activeSaveGame, activeSlot, forceInstantWriteback);
             }
             else
             {
@@ -1202,7 +1207,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
                 return;
 
             isQuittingGame = true;
-            WriteActiveSaveToDisk();
+            WriteActiveSaveToDisk(true);
         }
     }
 }

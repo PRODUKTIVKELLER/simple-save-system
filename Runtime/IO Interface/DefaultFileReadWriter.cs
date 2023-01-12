@@ -58,7 +58,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
             return data;
         }
 
-        public void WriteText(string path, string text)
+        public void WriteText(string path, string text, bool forceInstantWriteback)
         {
             string fullPath = AddApplicationPersistentDataPathToString(path);
 
