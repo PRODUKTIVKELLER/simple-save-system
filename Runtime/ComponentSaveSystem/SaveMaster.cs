@@ -5,6 +5,7 @@ using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Components;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Core;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Data;
 using Produktivkeller.SimpleSaveSystem.ComponentSaveSystem.Enums;
+using Produktivkeller.SimpleSaveSystem.Core.PlayerPrefsWrapper;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -207,7 +208,12 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
         /// <returns> If it was able to set the slot to the last used one </returns>
         public static bool SetSlotToLastUsedSlot(bool notifyListeners)
         {
-            int lastUsedSlot = PlayerPrefs.GetInt("SM-LastUsedSlot", -1);
+            int lastUsedSlot = -1;
+
+            if (PlayerPrefsGeneric.HasKey("SM-LastUsedSlot"))
+            {
+                lastUsedSlot = PlayerPrefsGeneric.GetInt("SM-LastUsedSlot");
+            }
 
             if (lastUsedSlot == -1)
             {
@@ -324,7 +330,7 @@ namespace Produktivkeller.SimpleSaveSystem.ComponentSaveSystem
 
             SyncReset();
 
-            PlayerPrefs.SetInt("SM-LastUsedSlot", slot);
+            PlayerPrefsGeneric.SetInt("SM-LastUsedSlot", slot);
 
             OnSlotChangeDone.Invoke(slot);
         }
