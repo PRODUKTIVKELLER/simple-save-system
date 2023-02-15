@@ -55,8 +55,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
 
             lastSaveDate = DateTime.Now;
 
-            metaData.lastSaveDate     = lastSaveDate.ToString();
-            metaData.creationDate     = creationDate.ToString();
+            metaData.lastSaveDate     = lastSaveDate.ToString(CultureInfo.InvariantCulture);
+            metaData.creationDate     = creationDate.ToString(CultureInfo.InvariantCulture);
             metaData.timePlayed       = timePlayed.ToString();
             metaData.migrationVersion = migrationVersion;
 
@@ -67,8 +67,8 @@ namespace Produktivkeller.SimpleSaveSystem.Core.SaveGameData
         {
             migrationVersion = metaData.migrationVersion;
 
-            DateTime.TryParse(metaData.lastSaveDate, out lastSaveDate);
-            DateTime.TryParse(metaData.creationDate, out creationDate);
+            DateTime.TryParse(metaData.lastSaveDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out lastSaveDate);
+            DateTime.TryParse(metaData.creationDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out creationDate);
             TimeSpan.TryParse(metaData.timePlayed, out timePlayed);
 
             if (saveData.Count > 0 || primitiveData.Count > 0)
