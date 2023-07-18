@@ -1,113 +1,26 @@
 using System;
 using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Configuration
 {
     public class SaveSettings : ScriptableObject
     {
-        private void OnDestroy()
-        {
-            PlatformSpecificSaveSettingsProvider.ClearStaticVariables();
-        }
-
-        public static SaveSettings Get()
-        {
-            SaveSettings saveSettings = PlatformSpecificSaveSettingsProvider.GetSaveSettingOfCurrentPlatform();
-
-#if UNITY_EDITOR
-            // In case the settings are not found, we create one
-            if (saveSettings == null)
-            {
-                return CreateFile();
-            }
-#endif
-
-            // In case it still doesn't exist, somehow it got removed.
-            // We send a default instance of SavePluginSettings.
-            if (saveSettings == null)
-            {
-                Debug.LogWarning("Could not find SavePluginsSettings in resource folder, did you remove it? Using default settings.");
-                saveSettings = ScriptableObject.CreateInstance<SaveSettings>();
-            }
-
-            return saveSettings;
-        }
-
-#if UNITY_EDITOR
-
-        public static SaveSettings CreateFile()
-        {
-            string resourceFolderPath = string.Format("{0}/{1}", Application.dataPath, "Resources");
-            string filePath = string.Format("{0}/{1}", resourceFolderPath, "Save Plugin Settings.asset");
-
-            // In case the directory doesn't exist, we create a new one.
-            if (!Directory.Exists(resourceFolderPath))
-            {
-                UnityEditor.AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-
-            // Check if the settings file exists in the resources path
-            // If not, we create a new one.
-            if (!File.Exists(filePath))
-            {
-                SaveSettings instance = ScriptableObject.CreateInstance<SaveSettings>();
-                instance.isForAllPlatforms = true;
-                UnityEditor.AssetDatabase.CreateAsset(instance, "Assets/Resources/Save Plugin Settings.asset");
-                UnityEditor.AssetDatabase.SaveAssets();
-                UnityEditor.AssetDatabase.Refresh();
-
-                return instance;
-            }
-            else
-            {
-                return Resources.Load("Save Plugin Settings", typeof(SaveSettings)) as SaveSettings;
-            }
-        }
-
-        private void OnValidate()
-        {
-            this.fileExtensionName = ValidateString(fileExtensionName, ".savegame", false);
-            this.fileFolderName = ValidateString(fileFolderName, "SaveData", true);
-            this.fileName = ValidateString(fileName, "Slot", true);
-
-            if (fileExtensionName[0] != '.')
-            {
-                Debug.LogWarning("SaveSettings: File extension name needs to start with a .");
-                fileExtensionName = string.Format(".{0}", fileExtensionName);
-            }
-        }
-
-        private string ValidateString(string input, string defaultString, bool allowWhiteSpace)
-        {
-            if (string.IsNullOrEmpty(input) || (!allowWhiteSpace && input.Any(Char.IsWhiteSpace)))
-            {
-                Debug.LogWarning(string.Format("SaveSettings: Set {0} back to {1} " +
-                                               "since it was empty or has whitespace.", input, defaultString));
-                return defaultString;
-            }
-            else
-            {
-                return input;
-            }
-        }
-
-#endif
         [Header("Platform")]
-        public bool            isForAllPlatforms;
+        public bool isForAllPlatforms;
         public RuntimePlatform runtimePlatform;
 
         [Header("Versioning")]
         public bool writebackToFileDisabled;
 
         [Header("Storage Settings")]
-        public string fileExtensionName = ".savegame";
-        public string fileFolderName = "SaveData";
-        public string fileFolderNameEditor = "SaveData Editor";
-        public string fileName = "Slot";
+        public string fileExtensionName           = ".savegame";
+        public string fileFolderName              = "Save Data";
+        public string fileFolderNameEditor        = "Save Data - Editor";
+        public string fileName                    = "Slot";
         public string specialDataFolderNameSuffix = "_Data";
-        public bool useMultiThreadedWriteback = true;
 
         [Header("Configuration")]
         [Range(1, 300)]
@@ -121,22 +34,104 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
 
         [Header("Auto Save")]
         [Tooltip("Automatically save to the active slot based on a time interval, useful for WEBGL games")]
-        public bool saveOnInterval = false;
+        public bool saveOnInterval;
         [Tooltip("Time interval in seconds before the autosave happens"), Range(1, 3000)]
         public int saveIntervalTime = 1;
 
         [Header("Initialization")]
         public bool loadDefaultSlotOnStart = true;
         [Range(0, 299)]
-        public int defaultSlot = 0;
+        public int defaultSlot;
 
         [Header("Extras")]
-        public bool useHotkeys = false;
+        public bool useHotkeys;
         public KeyCode saveAndWriteToDiskKey = KeyCode.F2;
-        public KeyCode syncSaveGameKey = KeyCode.F4;
-        public KeyCode syncLoadGameKey = KeyCode.F5;
+        public KeyCode syncSaveGameKey       = KeyCode.F4;
+        public KeyCode syncLoadGameKey       = KeyCode.F5;
 
         [Header("Debug (Unity Editor Only)")]
-        public bool showSaveFileUtilityLog = false;
+        public bool showSaveFileUtilityLog;
+
+        private void OnDestroy()
+        {
+            PlatformSpecificSaveSettingsProvider.ClearStaticVariables();
+        }
+
+        public static SaveSettings Get()
+        {
+            SaveSettings saveSettings = PlatformSpecificSaveSettingsProvider.GetSaveSettingOfCurrentPlatform();
+
+#if UNITY_EDITOR
+
+            // In case the settings are not found, we create one
+            if (saveSettings == null)
+            {
+                return CreateFile();
+            }
+#endif
+
+            // In case it still doesn't exist, somehow it got removed.
+            // We send a default instance of SavePluginSettings.
+            if (saveSettings == null)
+            {
+                Debug.LogWarning("Could not find 'SavePluginsSettings' in Resource folder. Using default settings.");
+                saveSettings = CreateInstance<SaveSettings>();
+            }
+
+            return saveSettings;
+        }
+
+#if UNITY_EDITOR
+
+        public static SaveSettings CreateFile()
+        {
+            string resourceFolderPath = $"{Application.dataPath}/{"Resources"}";
+            string filePath           = $"{resourceFolderPath}/{"Save Settings.asset"}";
+
+            if (!Directory.Exists(resourceFolderPath))
+            {
+                AssetDatabase.CreateFolder("Assets", "Resources");
+            }
+
+            if (!File.Exists(filePath))
+            {
+                SaveSettings instance = CreateInstance<SaveSettings>();
+                instance.isForAllPlatforms = true;
+                AssetDatabase.CreateAsset(instance, "Assets/Resources/Save Settings.asset");
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+
+                return instance;
+            }
+
+            return Resources.Load("Save Settings", typeof(SaveSettings)) as SaveSettings;
+        }
+
+        private void OnValidate()
+        {
+            fileExtensionName = ValidateString(fileExtensionName, ".savegame", false);
+            fileFolderName    = ValidateString(fileFolderName,    "SaveData",  true);
+            fileName          = ValidateString(fileName,          "Slot",      true);
+
+            if (fileExtensionName[0] != '.')
+            {
+                Debug.LogWarning("SaveSettings: File extension name needs to start with a .");
+                fileExtensionName = $".{fileExtensionName}";
+            }
+        }
+
+        private string ValidateString(string input, string defaultString, bool allowWhiteSpace)
+        {
+            if (string.IsNullOrEmpty(input) || !allowWhiteSpace && input.Any(Char.IsWhiteSpace))
+            {
+                Debug.LogWarning($"SaveSettings: Set {input} back to {defaultString} " + "since it was empty or has whitespace.");
+
+                return defaultString;
+            }
+
+            return input;
+        }
+
+#endif
     }
 }

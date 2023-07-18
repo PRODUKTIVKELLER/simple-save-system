@@ -33,36 +33,5 @@ namespace Produktivkeller.SimpleSaveSystem.Editor
         {
             Selection.activeInstanceID = SaveSettings.Get().GetInstanceID();
         }
-
-        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Utility/Wipe Save Identifications (Active Scene)")]
-        public static void WipeSceneSaveIdentifications()
-        {
-            var activeScene = EditorSceneManager.GetActiveScene();
-            GameObject[] rootObjects = activeScene.GetRootGameObjects();
-            int rootObjectCount = rootObjects.Length;
-
-            // Get all Saveables, including children and inactive.
-            for (int i = 0; i < rootObjectCount; i++)
-            {
-                foreach (Saveable item in rootObjects[i].GetComponentsInChildren<Saveable>(true))
-                {
-                    item.SaveIdentification = "";
-                    item.OnValidate();
-                }
-            }
-        }
-
-        [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Utility/Wipe Save Identifications (Active Selection(s))")]
-        public static void WipeActiveSaveIdentifications()
-        {
-            foreach (GameObject obj in Selection.gameObjects)
-            {
-                foreach (Saveable item in obj.GetComponentsInChildren<Saveable>(true))
-                {
-                    item.SaveIdentification = "";
-                    item.OnValidate();
-                }
-            }
-        }
     }
 }

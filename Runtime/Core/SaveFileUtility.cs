@@ -6,6 +6,7 @@ using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Produktivkeller.SimpleSaveSystem.Shipped_Save_Slot;
 using UnityEngine;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -221,9 +222,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
                     SaveGame saveGame = new SaveGame();
 
-                    if (ShippedSaveGame.ExistsShippedSaveGameForSlot(slot))
+                    if (ShippedSaveSlot.ExistsForSlot(slot))
                     {
-                        saveGame = JsonUtility.FromJson<SaveGame>(ShippedSaveGame.GetShippedSaveGameForSlot(slot).saveGameJson);
+                        saveGame = JsonUtility.FromJson<SaveGame>(ShippedSaveSlot.GetShippedSaveGameForSlot(slot).saveGameJson);
                         saveGame.OnLoad();
                     }
 
@@ -273,28 +274,9 @@ namespace Produktivkeller.SimpleSaveSystem.Core
 
             saveGame.OnWrite();
 
-            if (SaveSettings.Get().useMultiThreadedWriteback && forceNoMultiThread == false)
-            {
-                if (_writebackSaveGameJob != null && _writebackSaveGameJob.IsDone == false)
-                {
-                    Debug.Log("Skipped saving, due to running job.");
-                }
-                else
-                {
-                    Debug.Log("Started writeback job.");
 
-                    _writebackSaveGameJob = new WritebackSaveGameJob(savePath, saveGame, _fileReadWriter);
-
-                    _writebackSaveGameJob.Start();
-                }
-            }
-            else
-            {
-                _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, true));
-
-                saveGame.WritebackAllScheduledWritebacks();
-            }
-
+            _fileReadWriter.WriteText(savePath, JsonUtility.ToJson(saveGame, true));
+            saveGame.WritebackAllScheduledWritebacks();
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         SyncFiles();
