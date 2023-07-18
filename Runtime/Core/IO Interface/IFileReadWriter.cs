@@ -1,4 +1,4 @@
-namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
+namespace Produktivkeller.SimpleSaveSystem.Core.IO_Interface
 {
     public interface IFileReadWriter
     {
@@ -6,7 +6,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
 
         public string ReadText(string path);
 
-        public string[] ObtainAllSavegameFiles();
+        public string[] ObtainAllSaveGameFiles();
 
         public void CreateDirectory(string path);
 

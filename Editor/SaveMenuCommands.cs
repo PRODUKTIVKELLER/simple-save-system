@@ -1,8 +1,6 @@
 ﻿using Produktivkeller.SimpleSaveSystem.Configuration;
-using Produktivkeller.SimpleSaveSystem.Core;
 using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Produktivkeller.SimpleSaveSystem.Editor
@@ -12,7 +10,7 @@ namespace Produktivkeller.SimpleSaveSystem.Editor
         [MenuItem(itemName: "PRODUKTIVKELLER/Simple Save System/Open Save Location")]
         public static void OpenSaveLocation()
         {
-            string dataPath = string.Format("{0}/{1}/", Application.persistentDataPath, SaveSettings.Get().fileFolderName);
+            string dataPath = $"{Application.persistentDataPath}/{SaveSettings.Get().fileFolderName}/";
 
 #if UNITY_EDITOR_WIN
             dataPath = dataPath.Replace(@"/", @"\"); // Windows uses backward slashes

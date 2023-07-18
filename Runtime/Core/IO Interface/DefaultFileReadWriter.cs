@@ -1,8 +1,7 @@
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
-namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
+namespace Produktivkeller.SimpleSaveSystem.Core.IO_Interface
 {
     public class DefaultFileReadWriter : IFileReadWriter
     {
@@ -31,7 +30,7 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
             return false;
         }
 
-        public string[] ObtainAllSavegameFiles()
+        public string[] ObtainAllSaveGameFiles()
         {
             string[] filePaths = Directory.GetFiles(AddApplicationPersistentDataPathToString(SaveFileUtility.DataPathLocal));
 
@@ -59,21 +58,20 @@ namespace Produktivkeller.SimpleSaveSystem.Core.IOInterface
 
         private string RemoveApplicationPersistentDataPathFromString(string text)
         {
-            string textWithoutPersDataPath = text.Replace("\\", "/").
+            string result = text.Replace("\\", "/").
                     Replace(applicationPersistentDataPath.Replace("\\", "/"), "");
 
-            if (textWithoutPersDataPath.StartsWith("/"))
+            if (result.StartsWith("/"))
             {
-                textWithoutPersDataPath = textWithoutPersDataPath.Substring(1);
+                result = result[1..];
             }
 
-            return textWithoutPersDataPath;
+            return result;
         }
 
         private string AddApplicationPersistentDataPathToString(string text)
         {
-            return string.Format("{0}/{1}",
-                    applicationPersistentDataPath, text);
+            return $"{applicationPersistentDataPath}/{text}";
         }
     }
 }

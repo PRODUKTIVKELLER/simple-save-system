@@ -12,9 +12,6 @@ namespace Produktivkeller.SimpleSaveSystem.Configuration
         public bool isForAllPlatforms;
         public RuntimePlatform runtimePlatform;
 
-        [Header("Versioning")]
-        public bool writebackToFileDisabled;
-
         [Header("Storage Settings")]
         public string fileExtensionName           = ".savegame";
         public string fileFolderName              = "Save Data";

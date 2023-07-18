@@ -1,10 +1,10 @@
 using Produktivkeller.SimpleSaveSystem.Configuration;
-using Produktivkeller.SimpleSaveSystem.Core.IOInterface;
 using Produktivkeller.SimpleSaveSystem.Core.SaveGameData;
 using Produktivkeller.SimpleSaveSystem.Migration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Produktivkeller.SimpleSaveSystem.Core.IO_Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -880,11 +880,6 @@ namespace Produktivkeller.SimpleSaveSystem.Core
             instance._coroutineTrackedPlaytime = instance.StartCoroutine(instance.TrackTimePlayed());
 
             var settings = SaveSettings.Get();
-
-            if (settings.writebackToFileDisabled)
-            {
-                Debug.LogError("Writeback is disabled. Make sure to enable it again, otherwise no savegame will ever be stored to files");
-            }
 
             if (settings.loadDefaultSlotOnStart)
             {
